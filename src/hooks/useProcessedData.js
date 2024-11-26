@@ -39,22 +39,6 @@ const useProcessedData = () => {
             .map((stats) => stats.avgDiscoveryTime || Infinity)
             .reduce((best, current) => Math.min(best, current), Infinity);
 
-          // Store regional stats for avgPrice and avgDiscoveryTime
-          const regionalStats = orchestratorData.regionalStats || {};
-          const avgPriceByRegion = {};
-          const avgDiscoveryTimeByRegion = {};
-          regions.forEach((region) => {
-            const stats = regionalStats[region] || {};
-            avgPriceByRegion[region] = stats.avgPrice || 0;
-            avgDiscoveryTimeByRegion[region] = stats.avgDiscoveryTime || Infinity;
-          });
-          // Store avgRTR per livepeer region
-          const avgRTRByRegion = {};
-          livepeerRegions.forEach((region) => {
-            const leaderboard = leaderboardResults[region] || {};
-            avgRTRByRegion[region] = leaderboard.latestRTR || 0;
-          });
-
           return {
             id: instanceId,
             price: instanceData.price || 0,
@@ -67,9 +51,6 @@ const useProcessedData = () => {
             bestDiscoveryTime: bestDiscoveryTime === Infinity ? null : bestDiscoveryTime,
             avgRTR: avgRTR || 0,
             avgSR: avgSR || 0,
-            avgPriceByRegion,
-            avgDiscoveryTimeByRegion,
-            avgRTRByRegion,
           };
         }
       );
@@ -89,6 +70,33 @@ const useProcessedData = () => {
         Object.values(leaderboardResults).reduce((sum, metrics) => sum + (metrics.latestSR || 0), 0) /
         (Object.keys(leaderboardResults).length || 1);
 
+      // Store regional stats for avgPrice and avgDiscoveryTime
+      const bestPriceByRegion = {};
+      const bestDiscoveryTimeByRegion = {};
+      instances.forEach((instance) => {
+        instance.probedFrom.forEach((region) => {
+          if (!bestPriceByRegion[region]){
+            bestPriceByRegion[region] = instance.price || Infinity;
+          } else if (instance.price && instance.price > 0.0 && bestPriceByRegion[region] > instance.price) {
+            bestPriceByRegion[region] = instance.price;
+          }
+          if (!bestDiscoveryTimeByRegion[region]){
+            bestDiscoveryTimeByRegion[region] = orchestratorData.regionalStats[region].avgDiscoveryTime || Infinity;
+          } else if (orchestratorData.regionalStats[region].avgDiscoveryTime && orchestratorData.regionalStats[region].avgDiscoveryTime > 0.0 && bestDiscoveryTimeByRegion[region] > orchestratorData.regionalStats[region].avgDiscoveryTime) {
+            bestDiscoveryTimeByRegion[region] = orchestratorData.regionalStats[region].avgDiscoveryTime;
+          }
+        });
+      });
+      // Store avgRTR per livepeer region
+      const bestRTRByRegion = {};
+      Object.entries(leaderboardResults).map(([region, leaderboard]) => {
+        if (!bestRTRByRegion[region]){
+          bestRTRByRegion[region] = leaderboard.latestRTR || Infinity;
+        } else if (leaderboard.latestRTR && leaderboard.latestRTR > 0.0 && bestRTRByRegion[region] > leaderboard.latestRTR) {
+          bestRTRByRegion[region] = leaderboard.latestRTR;
+        }
+      });
+
       return {
         id: orchestratorId,
         name: orchestratorData.name,
@@ -97,6 +105,9 @@ const useProcessedData = () => {
         avgRTR: avgRTR || 0,
         avgSR: avgSR || 0,
         instances,
+        bestPriceByRegion,
+        bestDiscoveryTimeByRegion,
+        bestRTRByRegion,
       };
     });
 
