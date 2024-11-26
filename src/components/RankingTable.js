@@ -152,7 +152,7 @@ const RankingTable = ({ orchestrators, selectedKPI }) => {
                 <tr onClick={() => handleRowClick(orchestrator.id)}>
                   <td>{index + 1}</td>
                   <td>{orchestrator.name}</td>
-                  <td>{selectedKPI == "avgPrice" ? "$" : ""}{formattedValue >= 0 ? formattedValue?.toFixed(3) || 0 : "?"}{selectedKPI == "avgDiscoveryTime" ? " ms" : ""}</td>
+                  <td>{selectedKPI == "avgPrice" ? "$" : ""}{formattedValue >= 0 ? formattedValue.toPrecision(3) || 0 : "?"}{selectedKPI == "avgDiscoveryTime" ? " ms" : ""}</td>
                 </tr>
                 {expandedOrchestrator === orchestrator.id && (
                   <tr className="expanded-row">
