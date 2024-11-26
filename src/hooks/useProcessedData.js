@@ -75,14 +75,18 @@ const useProcessedData = () => {
       const bestDiscoveryTimeByRegion = {};
       instances.forEach((instance) => {
         instance.probedFrom.forEach((region) => {
-          if (!bestPriceByRegion[region]){
+          if (!bestPriceByRegion[region]) {
             bestPriceByRegion[region] = instance.price || Infinity;
           } else if (instance.price && instance.price > 0.0 && bestPriceByRegion[region] > instance.price) {
             bestPriceByRegion[region] = instance.price;
           }
-          if (!bestDiscoveryTimeByRegion[region]){
+          if (!bestDiscoveryTimeByRegion[region]) {
             bestDiscoveryTimeByRegion[region] = orchestratorData.regionalStats[region].avgDiscoveryTime || Infinity;
-          } else if (orchestratorData.regionalStats[region].avgDiscoveryTime && orchestratorData.regionalStats[region].avgDiscoveryTime > 0.0 && bestDiscoveryTimeByRegion[region] > orchestratorData.regionalStats[region].avgDiscoveryTime) {
+          } else if (
+            orchestratorData.regionalStats[region].avgDiscoveryTime &&
+            orchestratorData.regionalStats[region].avgDiscoveryTime > 0.0 &&
+            bestDiscoveryTimeByRegion[region] > orchestratorData.regionalStats[region].avgDiscoveryTime
+          ) {
             bestDiscoveryTimeByRegion[region] = orchestratorData.regionalStats[region].avgDiscoveryTime;
           }
         });
@@ -90,7 +94,7 @@ const useProcessedData = () => {
       // Store avgRTR per livepeer region
       const bestRTRByRegion = {};
       Object.entries(leaderboardResults).map(([region, leaderboard]) => {
-        if (!bestRTRByRegion[region]){
+        if (!bestRTRByRegion[region]) {
           bestRTRByRegion[region] = leaderboard.latestRTR || Infinity;
         } else if (leaderboard.latestRTR && leaderboard.latestRTR > 0.0 && bestRTRByRegion[region] > leaderboard.latestRTR) {
           bestRTRByRegion[region] = leaderboard.latestRTR;
@@ -112,60 +116,61 @@ const useProcessedData = () => {
     });
 
     // Calculate average values for normalization across orchestrators
-    const avgDiscoveryTime =
-      orchestrators.reduce((sum, orchestrator) => sum + (orchestrator.avgDiscoveryTime || 0), 0) /
-      orchestrators.length;
+    const allDiscoveryTimes = orchestrators.map((orchestrator) => orchestrator.avgDiscoveryTime).filter((time) => time !== null);
+    const allPrices = orchestrators.map((orchestrator) => orchestrator.avgPrice).filter((price) => price !== null);
+    const allRTR = orchestrators.map((orchestrator) => orchestrator.avgRTR).filter((rtr) => rtr !== null);
 
-    const avgPrice =
-      orchestrators.reduce((sum, orchestrator) => sum + (orchestrator.avgPrice || 0), 0) /
-      orchestrators.length;
+    const minDiscoveryTime = Math.min(...allDiscoveryTimes);
+    const maxDiscoveryTime = Math.max(...allDiscoveryTimes);
+    const minPrice = Math.min(...allPrices);
+    const maxPrice = Math.max(...allPrices);
+    const minRTR = Math.min(...allRTR);
+    const maxRTR = Math.max(...allRTR);
 
-    const avgRTR =
-      orchestrators.reduce((sum, orchestrator) => sum + (orchestrator.avgRTR || 0), 0) /
-      orchestrators.length;
-
-    // Normalize discovery time and pricing for orchestrators
     orchestrators.forEach((orchestrator) => {
       orchestrator.normalizedDiscoveryTime =
         orchestrator.avgDiscoveryTime !== null
-          ? (avgDiscoveryTime - orchestrator.avgDiscoveryTime) / avgDiscoveryTime
+          ? 1 - (orchestrator.avgDiscoveryTime - minDiscoveryTime) / (maxDiscoveryTime - minDiscoveryTime)
           : null;
 
       orchestrator.normalizedPrice =
         orchestrator.avgPrice !== null
-          ? (avgPrice - orchestrator.avgPrice) / avgPrice
+          ? 1 - (orchestrator.avgPrice - minPrice) / (maxPrice - minPrice)
           : null;
 
       orchestrator.normalizedRTR =
         orchestrator.avgRTR !== null
-          ? (avgRTR - orchestrator.avgRTR) / avgRTR
+          ? 1 - (orchestrator.avgRTR - minRTR) / (maxRTR - minRTR)
           : null;
     });
 
     // Calculate average values for normalization across instances
     const allInstances = orchestrators.flatMap((orchestrator) => orchestrator.instances);
-    const avgInstanceDiscoveryTime =
-      allInstances.reduce((sum, inst) => sum + (inst.bestDiscoveryTime || 0), 0) / allInstances.length;
-    const avgInstancePrice =
-      allInstances.reduce((sum, inst) => sum + (inst.price || 0), 0) / allInstances.length;
-    const avgInstanceRTR =
-      allInstances.reduce((sum, inst) => sum + (inst.avgRTR || 0), 0) / allInstances.length;
+    const allInstanceDiscoveryTimes = allInstances.map((inst) => inst.bestDiscoveryTime).filter((time) => time !== null && time >= 0.0);
+    const allInstancePrices = allInstances.map((inst) => inst.price).filter((price) => price !== null && price >= 0.0);
+    const allInstanceRTR = allInstances.map((inst) => inst.avgRTR).filter((rtr) => rtr !== null && rtr >= 0.0);
 
-    // Normalize discovery time and pricing for instances
+    const minInstanceDiscoveryTime = Math.min(...allInstanceDiscoveryTimes);
+    const maxInstanceDiscoveryTime = Math.max(...allInstanceDiscoveryTimes);
+    const minInstancePrice = Math.min(...allInstancePrices);
+    const maxInstancePrice = Math.max(...allInstancePrices);
+    const minInstanceRTR = Math.min(...allInstanceRTR);
+    const maxInstanceRTR = Math.max(...allInstanceRTR);
+
     allInstances.forEach((instance) => {
       instance.normalizedDiscoveryTime =
         instance.bestDiscoveryTime !== null
-          ? (avgInstanceDiscoveryTime - instance.bestDiscoveryTime) / avgInstanceDiscoveryTime
+          ? 1 - (instance.bestDiscoveryTime - minInstanceDiscoveryTime) / (maxInstanceDiscoveryTime - minInstanceDiscoveryTime)
           : null;
 
       instance.normalizedPrice =
         instance.price !== null
-          ? (avgInstancePrice - instance.price) / avgInstancePrice
+          ? 1 - (instance.price - minInstancePrice) / (maxInstancePrice - minInstancePrice)
           : null;
 
       instance.normalizedRTR =
         instance.avgRTR !== null
-          ? (avgInstanceRTR - instance.avgRTR) / avgInstanceRTR
+          ? 1 - (instance.avgRTR - minInstanceRTR) / (maxInstanceRTR - minInstanceRTR)
           : null;
     });
 
@@ -188,27 +193,16 @@ const useProcessedData = () => {
     });
 
     // Calculate global buckets and percentiles
-    const allPrices = orchestrators
-      .flatMap((orchestrator) => orchestrator.instances.map((inst) => inst.price))
-      .filter((price) => price !== null);
-    const allDiscoveryTimes = orchestrators
-      .map((orchestrator) => orchestrator.avgDiscoveryTime)
-      .filter((time) => time !== null);
-    const allRTR = orchestrators
-      .map((orchestrator) => orchestrator.avgRTR)
-      .filter((rtr) => rtr !== null);
-    const allSR = orchestrators.map((orchestrator) => orchestrator.avgSR).filter((sr) => sr !== null);
-
-    const priceBuckets = createBuckets(allPrices, 10);
-    const discoveryTimeBuckets = createBuckets(allDiscoveryTimes, 10);
-    const performanceBucketsRTR = createBuckets(allRTR, 10);
-    const performanceBucketsSR = createBuckets(allSR, 10);
+    const priceBuckets = createBuckets(allInstancePrices, 10);
+    const discoveryTimeBuckets = createBuckets(allInstanceDiscoveryTimes, 10);
+    const performanceBucketsRTR = createBuckets(allInstanceRTR, 10);
+    const performanceBucketsSR = createBuckets(orchestrators.map((orchestrator) => orchestrator.avgSR).filter((sr) => sr !== null), 10);
 
     const aggregates = {
-      pricing: calculateAggregateStats(allPrices),
-      discoveryTime: calculateAggregateStats(allDiscoveryTimes),
-      performanceRTR: calculateAggregateStats(allRTR),
-      performanceSR: calculateAggregateStats(allSR),
+      pricing: calculateAggregateStats(allInstancePrices),
+      discoveryTime: calculateAggregateStats(allInstanceDiscoveryTimes),
+      performanceRTR: calculateAggregateStats(allInstanceRTR),
+      performanceSR: calculateAggregateStats(orchestrators.map((orchestrator) => orchestrator.avgSR).filter((sr) => sr !== null)),
       buckets: {
         pricing: priceBuckets,
         discoveryTime: discoveryTimeBuckets,

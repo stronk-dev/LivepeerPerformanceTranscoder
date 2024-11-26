@@ -33,14 +33,12 @@ const AccordionItem = ({ instanceScore, orchObj, instanceObj, startExpanded }) =
           <p>Orchestrator Name: {orchObj.name}</p>
           <p>Orchestrator ID: {orchObj.id}</p>
           <p>Average Discovery Time: {orchObj.avgDiscoveryTime}</p>
-          <p>Average Performance: {orchObj.avgPerformance}</p>
           <p>Average Price: {orchObj.avgPrice}</p>
           <p>Average RTR: {orchObj.avgRTR}</p>
           <p>Average SR: {orchObj.avgSR}</p>
           <p>Normalized Discovery Time: {orchObj.normalizedDiscoveryTime}</p>
           <p>Normalized Price: {orchObj.normalizedPrice}</p>
           <p>Normalized RTR: {orchObj.normalizedRTR}</p>
-          <p>Instance Average Performance: {instanceObj.avgPerformance}</p>
           <p>Instance Average RTR: {instanceObj.avgRTR}</p>
           <p>Instance Average SR: {instanceObj.avgSR}</p>
           <p>Instance ID: {instanceObj.id}</p>
@@ -60,8 +58,6 @@ const AccordionItem = ({ instanceScore, orchObj, instanceObj, startExpanded }) =
 // Side panel to show selected cluster or marker details
 const SidePanel = ({ selectedData, onClose }) => {
   if (!selectedData) return null;
-
-  console.log(selectedData);
 
   return (
     <div className="side-panel">
@@ -109,7 +105,7 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
   // Helper to determine pin color based on KPI score
   const getPinColor = (score, isSelected) => {
     if (isSelected) return 'yellow'; // Highlight selected item with yellow
-    if (score === null || score === undefined) return "gray"; // Default for missing data
+    if (score === null || score === undefined || score <= 0) return "gray"; // Default for missing data
     const normalized = Math.min(Math.max(score, 0), 1); // Normalize to [0, 1]
     return interpolateColor(normalized);
   };
@@ -117,10 +113,15 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
   // Custom cluster icon
   const createClusterCustomIcon = (cluster, isSelected) => {
     const childCount = cluster.getChildCount();
+    const childMarkers = cluster.getAllChildMarkers();
     const avgScore = (
-      cluster
-        .getAllChildMarkers()
-        .map((marker) => marker.options.options.instanceScore || 0)
+      childMarkers
+        .map((marker) => {
+          const instanceScore = marker.options.options.instanceScore;
+          return instanceScore !== null && instanceScore !== undefined
+            ? Math.min(Math.max(instanceScore, 0), 1)
+            : 0;
+        })
         .reduce((sum, score) => sum + score, 0) / childCount
     ).toFixed(2);
 
