@@ -12,37 +12,32 @@ const useProcessedData = () => {
     }
 
     const perRegionStats = {};
-
     const orchestrators = Object.entries(apiData).map(([orchestratorId, orchestratorData]) => {
+      const leaderboardResults = orchestratorData.leaderboardResults || {};
       const instances = Object.entries(orchestratorData.instances || {}).map(
         ([instanceId, instanceData]) => {
-          // Extract probedFrom, regions, and livepeer_regions
           const probedFrom = Object.keys(instanceData.probedFrom || {});
           const regions = Object.keys(instanceData.regions || {});
           const livepeerRegions = Object.keys(instanceData.livepeer_regions || {});
 
-          // Calculate lastPing as the maximum lastTime in probedFrom
           const lastPing = Object.values(instanceData.probedFrom || {}).reduce(
             (max, regionData) => Math.max(max, regionData.lastTime || 0),
             0
           );
 
-          // Calculate avgPerformance metrics (latestRTR, latestSR) by mapping livepeer_regions to leaderboardResults
-          let totalRTR = 0;
-          let totalSR = 0;
-          let performanceCount = 0;
+          const avgRTR = livepeerRegions.reduce((sum, region) => {
+            const leaderboard = leaderboardResults[region];
+            return leaderboard ? sum + (leaderboard.latestRTR || 0) : sum;
+          }, 0) / (livepeerRegions.length || 1);
 
-          livepeerRegions.forEach((region) => {
-            const leaderboard = orchestratorData.leaderboardResults?.[region];
-            if (leaderboard) {
-              totalRTR += leaderboard.latestRTR || 0;
-              totalSR += leaderboard.latestSR || 0;
-              performanceCount++;
-            }
-          });
+          const avgSR = livepeerRegions.reduce((sum, region) => {
+            const leaderboard = leaderboardResults[region];
+            return leaderboard ? sum + (leaderboard.latestSR || 0) : sum;
+          }, 0) / (livepeerRegions.length || 1);
 
-          const avgRTR = performanceCount > 0 ? totalRTR / performanceCount : null;
-          const avgSR = performanceCount > 0 ? totalSR / performanceCount : null;
+          const bestDiscoveryTime = Object.values(orchestratorData.regionalStats || {})
+            .map((stats) => stats.avgDiscoveryTime || Infinity)
+            .reduce((best, current) => Math.min(best, current), Infinity);
 
           return {
             id: instanceId,
@@ -53,42 +48,59 @@ const useProcessedData = () => {
             regions,
             livepeer_regions: livepeerRegions,
             lastPing: lastPing || null,
-            bestDiscoveryTime: Object.values(orchestratorData.regionalStats || {})
-              .map((stats) => stats.avgDiscoveryTime || Infinity)
-              .reduce((best, current) => Math.min(best, current), Infinity) || null,
-            avgRTR,
-            avgSR,
+            bestDiscoveryTime: bestDiscoveryTime === Infinity ? null : bestDiscoveryTime,
+            avgRTR: avgRTR || null,
+            avgSR: avgSR || null,
           };
         }
       );
 
-      // Calculate orchestrator-level aggregates
       const avgPrice =
         instances.reduce((sum, inst) => sum + inst.price, 0) / (instances.length || 1);
+
+      const avgDiscoveryTime = Object.values(orchestratorData.regionalStats || {})
+        .map((stats) => stats.avgDiscoveryTime || Infinity)
+        .reduce((best, current) => Math.min(best, current), Infinity);
+
       const avgRTR =
-        instances.reduce((sum, inst) => sum + (inst.avgRTR || 0), 0) /
-        (instances.filter((inst) => inst.avgRTR !== null).length || 1);
+        Object.values(leaderboardResults).reduce((sum, metrics) => sum + (metrics.latestRTR || 0), 0) /
+        (Object.keys(leaderboardResults).length || 1);
+
       const avgSR =
-        instances.reduce((sum, inst) => sum + (inst.avgSR || 0), 0) /
-        (instances.filter((inst) => inst.avgSR !== null).length || 1);
-
-      const bestDiscoveryTime = instances.reduce(
-        (best, inst) => Math.min(best, inst.bestDiscoveryTime || Infinity),
-        Infinity
-      );
-
-      const validBestDiscoveryTime =
-        bestDiscoveryTime === Infinity ? null : bestDiscoveryTime;
+        Object.values(leaderboardResults).reduce((sum, metrics) => sum + (metrics.latestSR || 0), 0) /
+        (Object.keys(leaderboardResults).length || 1);
 
       return {
         id: orchestratorId,
         name: orchestratorData.name,
         avgPrice: avgPrice || null,
+        avgDiscoveryTime: avgDiscoveryTime === Infinity ? null : avgDiscoveryTime,
         avgRTR: avgRTR || null,
         avgSR: avgSR || null,
-        bestDiscoveryTime: validBestDiscoveryTime,
         instances,
       };
+    });
+
+    // Calculate average values for normalization
+    const avgDiscoveryTime =
+      orchestrators.reduce((sum, orchestrator) => sum + (orchestrator.avgDiscoveryTime || 0), 0) /
+      orchestrators.length;
+
+    const avgPrice =
+      orchestrators.reduce((sum, orchestrator) => sum + (orchestrator.avgPrice || 0), 0) /
+      orchestrators.length;
+
+    // Normalize discovery time and pricing
+    orchestrators.forEach((orchestrator) => {
+      orchestrator.normalizedDiscoveryTime =
+        orchestrator.avgDiscoveryTime !== null
+          ? (avgDiscoveryTime - orchestrator.avgDiscoveryTime) / avgDiscoveryTime
+          : null;
+
+      orchestrator.normalizedPrice =
+        orchestrator.avgPrice !== null
+          ? (avgPrice - orchestrator.avgPrice) / avgPrice
+          : null;
     });
 
     // Process per-region stats
@@ -98,7 +110,6 @@ const useProcessedData = () => {
           perRegionStats[region] = { totalAvgTime: 0, totalPrice: 0, count: 0 };
         }
 
-        // Aggregate per-region stats
         perRegionStats[region].totalAvgTime += stats.avgDiscoveryTime || 0;
 
         const instancePrices = Object.values(orchestratorData.instances || {}).map(
@@ -115,14 +126,12 @@ const useProcessedData = () => {
       .flatMap((orchestrator) => orchestrator.instances.map((inst) => inst.price))
       .filter((price) => price !== null);
     const allDiscoveryTimes = orchestrators
-      .map((orchestrator) => orchestrator.bestDiscoveryTime)
+      .map((orchestrator) => orchestrator.avgDiscoveryTime)
       .filter((time) => time !== null);
     const allRTR = orchestrators
-      .flatMap((orchestrator) => orchestrator.instances.map((inst) => inst.avgRTR))
+      .map((orchestrator) => orchestrator.avgRTR)
       .filter((rtr) => rtr !== null);
-    const allSR = orchestrators
-      .flatMap((orchestrator) => orchestrator.instances.map((inst) => inst.avgSR))
-      .filter((sr) => sr !== null);
+    const allSR = orchestrators.map((orchestrator) => orchestrator.avgSR).filter((sr) => sr !== null);
 
     const priceBuckets = createBuckets(allPrices, 10);
     const discoveryTimeBuckets = createBuckets(allDiscoveryTimes, 10);

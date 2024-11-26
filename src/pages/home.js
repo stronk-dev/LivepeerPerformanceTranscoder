@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import DvdLogo from "../components/DvdLogo";
 import LoadingScreen from "../components/loadingScreen";
+import RankingTable from "../components/RankingTable";
 import useProcessedData from "../hooks/useProcessedData";
 import "./home.css";
 
@@ -11,13 +12,16 @@ const Home = () => {
   const [activeTab, setActiveTab] = useState("pricing");
 
   const renderTabContent = () => {
+    const selectedKPI = activeTab === "pricing" ? "avgPrice" :
+      activeTab === "discovery-time" ? "avgDiscoveryTime" :
+        activeTab === "performance" ? "avgRTR" : null;
     switch (activeTab) {
       case "pricing":
         return (
           <div className="tab-content">
             <section className="ranking-section">
-              <h3>Ranking</h3>
-              {/* Placeholder for Ranking Component */}
+              <h3>Pricing Ranking</h3>
+              <RankingTable orchestrators={processedData.orchestrators} selectedKPI={selectedKPI} />
             </section>
             <section className="map-section">
               <h3>Interactive World Map</h3>
@@ -33,8 +37,8 @@ const Home = () => {
         return (
           <div className="tab-content">
             <section className="ranking-section">
-              <h3>Ranking</h3>
-              {/* Placeholder for Ranking Component */}
+              <h3>Discovery Time Ranking</h3>
+              <RankingTable orchestrators={processedData.orchestrators} selectedKPI={selectedKPI} />
             </section>
             <section className="map-section">
               <h3>Interactive World Map</h3>
@@ -50,8 +54,8 @@ const Home = () => {
         return (
           <div className="tab-content">
             <section className="ranking-section">
-              <h3>Ranking</h3>
-              {/* Placeholder for Ranking Component */}
+              <h3>Performance Ranking</h3>
+              <RankingTable orchestrators={processedData.orchestrators} selectedKPI={selectedKPI} />
             </section>
             <section className="map-section">
               <h3>Interactive World Map</h3>
@@ -78,29 +82,31 @@ const Home = () => {
   }
 
   return (
-    <div ref={rootContainerRef}>
+    <div ref={rootContainerRef} className="home-root">
       <DvdLogo parentRef={rootContainerRef} />
-      <div className="tabs">
-        <button
-          className={`tab ${activeTab === "pricing" ? "active" : ""}`}
-          onClick={() => setActiveTab("pricing")}
-        >
-          Pricing
-        </button>
-        <button
-          className={`tab ${activeTab === "discovery-time" ? "active" : ""}`}
-          onClick={() => setActiveTab("discovery-time")}
-        >
-          Discovery Time
-        </button>
-        <button
-          className={`tab ${activeTab === "performance" ? "active" : ""}`}
-          onClick={() => setActiveTab("performance")}
-        >
-          Performance
-        </button>
-      </div>
-      {renderTabContent()}
+      <header className="header-bar">
+        <div className="tabs">
+          <button
+            className={`tab ${activeTab === "pricing" ? "active" : ""}`}
+            onClick={() => setActiveTab("pricing")}
+          >
+            Pricing
+          </button>
+          <button
+            className={`tab ${activeTab === "discovery-time" ? "active" : ""}`}
+            onClick={() => setActiveTab("discovery-time")}
+          >
+            Discovery Time
+          </button>
+          <button
+            className={`tab ${activeTab === "performance" ? "active" : ""}`}
+            onClick={() => setActiveTab("performance")}
+          >
+            Performance
+          </button>
+        </div>
+      </header>
+      <div className="scrollable-content">{renderTabContent()}</div>
     </div>
   );
 };

@@ -13,23 +13,6 @@
   background-color: var(--darker); /* Give it a thin, blue line look for separation */
 }
 
-html {
-  overflow-x: hidden;
-}
-
-h4 {
-  font-size: 1.5rem;
-  color: var(--weird);
-  text-align: center;
-  margin: 20px 0;
-  transition: transform 0.2s, color 0.3s ease;
-}
-
-h4:hover {
-  transform: scale(1.1);
-  color: var(--yellow);
-}
-
 .loading-screen {
   display: flex;
   justify-content: center;
@@ -41,13 +24,24 @@ h4:hover {
   font-size: 1.8rem;
 }
 
+.home-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: var(--body-background-color);
+  overflow: none;
+}
+
+.header-bar {
+  background-color: var(--section-background);
+  padding: 10px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
 .tabs {
   display: flex;
   justify-content: center;
-  margin: 20px 0;
-  background: var(--section-background);
-  padding: 10px;
-  border-radius: 8px;
 }
 
 .tab {
@@ -71,11 +65,17 @@ h4:hover {
   background: var(--button-hover-background);
 }
 
+.scrollable-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background-color: var(--section-background);
+}
+
 .tab-content {
-  margin: 20px;
+  flex: 1;
   padding: 20px;
   background: var(--section-background);
-  border-radius: 10px;
 }
 
 .ranking-section,
@@ -85,4 +85,23 @@ h4:hover {
   padding: 15px;
   background: var(--darker);
   border-radius: 8px;
+}
+
+/* Scrollbar Styling */
+.scrollable-content::-webkit-scrollbar {
+  width: 12px;
+}
+
+.scrollable-content::-webkit-scrollbar-track {
+  background: var(--scrollbar-track-color);
+}
+
+.scrollable-content::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-color);
+  border-radius: 6px;
+  filter: brightness(0.8);
+}
+
+.scrollable-content::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover-color);
 }
