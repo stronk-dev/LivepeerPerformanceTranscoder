@@ -1,0 +1,88 @@
+/* home.css - Styles specific to the home.js page */
+
+.dvd-logo {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  transition: transform 0.5s ease-in-out;
+}
+
+.hr {
+  height: 2em;
+  border: none;
+  background-color: var(--darker); /* Give it a thin, blue line look for separation */
+}
+
+html {
+  overflow-x: hidden;
+}
+
+h4 {
+  font-size: 1.5rem;
+  color: var(--weird);
+  text-align: center;
+  margin: 20px 0;
+  transition: transform 0.2s, color 0.3s ease;
+}
+
+h4:hover {
+  transform: scale(1.1);
+  color: var(--yellow);
+}
+
+.loading-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--dark);
+  color: var(--text-color);
+  font-size: 1.8rem;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+  background: var(--section-background);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.tab {
+  background: var(--button-background);
+  color: var(--button-text-color);
+  border: 1px solid var(--button-border);
+  padding: 10px 20px;
+  margin: 0 5px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.tab.active {
+  background: var(--button-hover-background);
+  color: var(--accent-color);
+}
+
+.tab:hover {
+  background: var(--button-hover-background);
+}
+
+.tab-content {
+  margin: 20px;
+  padding: 20px;
+  background: var(--section-background);
+  border-radius: 10px;
+}
+
+.ranking-section,
+.map-section,
+.histogram-section {
+  margin: 20px 0;
+  padding: 15px;
+  background: var(--darker);
+  border-radius: 8px;
+}
