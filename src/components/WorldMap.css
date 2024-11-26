@@ -120,32 +120,30 @@
   color: var(--placeholder-color);
 }
 
-/* Custom cluster styling */
-.custom-cluster {
-  transition: transform 0.2s ease;
-}
-
-.custom-cluster:hover {
-  transform: scale(1.1);
-}
-
 /* Custom pin styling */
 .custom-pin {
   transition: transform 0.2s ease;
+  cursor: pointer;
+  border-radius: 50%;
+  border: 3px solid var(--lightest);
+  text-align: center; 
+  color: white;
+  font-size: 12px;
 }
 
 .custom-pin:hover {
   transform: scale(1.1);
 }
 
-/* Probe pin styling */
+/* Probe origin pin styling */
 .probe-pin {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 3px solid white;
-  background-color: blue;
   transition: transform 0.2s ease;
+  cursor: pointer;
+  background-color: var(--blue);
+  width: 24px;
+  height: 24px;;
+  border-radius: 50%;
+  border: 3px solid var(--grey);
 }
 
 .probe-pin:hover {

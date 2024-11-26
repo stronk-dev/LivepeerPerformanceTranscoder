@@ -97,14 +97,21 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedData, setSelectedData] = useState(null);
 
+  const interpolateColor = (score) => {
+    const startColor = [247, 118, 142];
+    const endColor = [115, 218, 202];
+    const r = Math.round(startColor[0] + (endColor[0] - startColor[0]) * score);
+    const g = Math.round(startColor[1] + (endColor[1] - startColor[1]) * score);
+    const b = Math.round(startColor[2] + (endColor[2] - startColor[2]) * score);
+    return `rgb(${r}, ${g}, ${b})`;
+  };
+
   // Helper to determine pin color based on KPI score
   const getPinColor = (score, isSelected) => {
     if (isSelected) return 'yellow'; // Highlight selected item with yellow
     if (score === null || score === undefined) return "gray"; // Default for missing data
     const normalized = Math.min(Math.max(score, 0), 1); // Normalize to [0, 1]
-    const red = Math.round(255 * (1 - normalized));
-    const green = Math.round(255 * normalized);
-    return `rgb(${red}, ${green}, 0)`; // Gradient from red to green
+    return interpolateColor(normalized);
   };
 
   // Custom cluster icon
@@ -121,8 +128,8 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
     const color = getPinColor(avgScore, isSelected);
 
     return L.divIcon({
-      html: `<div style="background-color: ${color}; width: ${size}px; height: ${size}px; line-height: ${size}px; border-radius: 50%; border: 3px solid white; text-align: center; color: white; font-size: 12px;">${childCount}</div>`,
-      className: "custom-cluster",
+      className: "dummy",
+      html: `<div class="custom-pin" style="background-color: ${color}; width: ${size}px; height: ${size}px; line-height: ${size}px;">${childCount}</div>`,
     });
   };
 
@@ -174,7 +181,7 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
             showCoverageOnHover={false}
             spiderfyOnMaxZoom={false}
             zoomToBoundsOnClick={false}
-            iconCreateFunction={(cluster) => createClusterCustomIcon(cluster, cluster === selectedData)}
+            iconCreateFunction={(cluster) => createClusterCustomIcon(cluster, cluster?.layer?.getAllChildMarkers() === selectedData || false)}
             eventHandlers={{
               clusterclick: (e) => {
                 const cluster = e.layer;
@@ -194,11 +201,13 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
                     instanceObj: instance,
                   }}
                   icon={L.divIcon({
-                    className: "custom-pin",
-                    html: `<div style="background-color: ${getPinColor(
+                    className: "dummy",
+                    html: `<div class="custom-pin" style="background-color: ${getPinColor(
                       instance[selectedKPI],
-                      selectedData === instance
-                    )}; width: 12px; height: 12px; border-radius: 50%;"></div>`,
+                      selectedData?.instanceScore === instance[selectedKPI] &&
+                      selectedData?.orchObj === instance?.orchObj &&
+                      selectedData?.instanceObj === instance?.instanceObj
+                    )}; width: 24px; height: 24px; border-radius: 50%;"></div>`,
                   })}
                   eventHandlers={{
                     click: () => {
@@ -220,8 +229,8 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
               key={`probe-region-${index}`}
               position={[region.latitude, region.longitude]}
               icon={L.divIcon({
-                className: "probe-pin",
-                html: `<div style="background-color: blue; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white;"></div>`,
+                className: 'dummy',
+                html: `<div class="probe-pin""></div>`,
               })}
             >
               <Popup>
