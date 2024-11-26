@@ -5,6 +5,7 @@ import RankingTable from "../components/RankingTable";
 import Histogram from "../components/Histogram";
 import WorldMap from "../components/WorldMap";
 import useProcessedData from "../hooks/useProcessedData";
+import { FaDollarSign, FaClock, FaChartLine, FaMap, FaTable, FaChartBar } from 'react-icons/fa';
 import "./home.css";
 
 const Home = () => {
@@ -38,7 +39,8 @@ const Home = () => {
             <div className="scrollable-content">
               <div className="tab-content">
                 <section className="ranking-section">
-                  <h3>{getTitle()} Ranking</h3>
+                  <h4>{getTitle()} Ranking</h4>
+                  {activeKPI == "pricing" ? <span>(for 1 hour of 1080p 30fps, assuming 1 ETH = 3000 USD)</span> : ""}
                   <RankingTable orchestrators={processedData.orchestrators} selectedKPI={selectedKPI} />
                 </section>
               </div>
@@ -65,7 +67,7 @@ const Home = () => {
             <div className="scrollable-content">
               <div className="tab-content">
                 <section className="histogram-section">
-                  <h3>{getTitle()} Histogram</h3>
+                  <h4>{getTitle()} Charts</h4>
                   <Histogram aggregateData={processedData.aggregates} selectedKPI={selectedKPI} />
                 </section>
               </div>
@@ -93,18 +95,21 @@ const Home = () => {
             className={`tab ${activeKPI === "pricing" ? "active" : ""}`}
             onClick={() => setKPI("pricing")}
           >
+            <FaDollarSign className="tab-icon" />
             Pricing
           </button>
           <button
             className={`tab ${activeKPI === "discovery-time" ? "active" : ""}`}
             onClick={() => setKPI("discovery-time")}
           >
+            <FaClock className="tab-icon" />
             Discovery Time
           </button>
           <button
             className={`tab ${activeKPI === "performance" ? "active" : ""}`}
             onClick={() => setKPI("performance")}
           >
+            <FaChartLine className="tab-icon" />
             Performance
           </button>
         </div>
@@ -113,18 +118,21 @@ const Home = () => {
             className={`tab ${activeView === "table" ? "active" : ""}`}
             onClick={() => setView("table")}
           >
+            <FaTable className="tab-icon" />
             Ranking
           </button>
           <button
             className={`tab ${activeView === "map" ? "active" : ""}`}
             onClick={() => setView("map")}
           >
+            <FaMap className="tab-icon" />
             World Map
           </button>
           <button
             className={`tab ${activeView === "distribution" ? "active" : ""}`}
             onClick={() => setView("distribution")}
           >
+            <FaChartBar className="tab-icon" />
             Distribution
           </button>
         </div>

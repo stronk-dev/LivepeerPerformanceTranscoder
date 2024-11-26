@@ -107,8 +107,6 @@ const RankingTable = ({ orchestrators, selectedKPI }) => {
 
   return (
     <div className="ranking-table">
-      <h4>Ranking Table</h4>
-
       {/* Dropdown for Region Selection */}
       <div className="region-selector">
         <label htmlFor="region-select">Select Region:</label>
@@ -161,17 +159,16 @@ const RankingTable = ({ orchestrators, selectedKPI }) => {
                     <td colSpan="3">
                       <div className="expanded-content">
                         {selectedKPI === "avgPrice" && (
-                          <p>
-                            <strong>Wei per pixel:</strong> {value.toFixed(0)} Wei<br />
-                            <strong>Converted Price:</strong> {ethPerHour?.toFixed(8)} ETH/hr at 1080p 30fps<br />
-                            <strong>Price in Dollars:</strong> ${(ethPerHour * 3000)?.toFixed(3)} (assuming 1 ETH = 3000 USD)
-                          </p>
+                          <span>
+                            {value.toFixed(1)} Wei -> {ethPerHour?.toFixed(8)} ETH/hr<br />
+                            TODO: results that make up the avg
+                          </span>
                         )}
                         {selectedKPI === "avgDiscoveryTime" && (
-                          <p>Discovery time is measured in milliseconds (ms).</p>
+                          <span>TODO: results that make up the avg</span>
                         )}
                         {selectedKPI === "avgRTR" && (
-                          <p>Realtime ratio (RTR) indicates the performance of the orchestrator.</p>
+                          <span>TODO: results that make up the avg</span>
                         )}
                       </div>
                     </td>

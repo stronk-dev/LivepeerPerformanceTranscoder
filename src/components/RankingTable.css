@@ -98,3 +98,7 @@ td:nth-child(3), th:nth-child(3) {
   color: var(--text-color);
   cursor: pointer;
 }
+
+.expanded-content {
+  display: flex;
+}
