@@ -36,13 +36,22 @@ const Histogram = ({ aggregateData, selectedKPI }) => {
                 height: `${(bucket.count / maxCount) * 100}%`,
               }}
             >
-              {/* <span className="count-label">{bucket.count}</span> */}
-              <span className="tooltip">{bucket.count}</span>
+              <div className="tooltip">
+                <span>Observations: {bucket.count}</span>
+                <span>Min: {bucket.range[0].toFixed(2)}</span>
+                <span>Max: {bucket.range[1].toFixed(2)}</span>
+              </div>
             </div>
-            <span className="label">
-              {`${bucket.range[0].toFixed(2)} - ${bucket.range[1].toFixed(2)}`}
-            </span>
           </div>
+        ))}
+      </div>
+
+      {/* X-axis labels for histogram buckets */}
+      <div className="histogram-x-axis">
+        {buckets.map((bucket, index) => (
+          <span key={index} className="x-axis-label">
+            {index + 1< buckets.length && bucket.range[1].toFixed(1)}
+          </span>
         ))}
       </div>
 
@@ -58,7 +67,7 @@ const Histogram = ({ aggregateData, selectedKPI }) => {
               width: `${((percentiles.p75 - percentiles.p25) / (range[1] - range[0])) * 100}%`,
             }}
           ></div>
-          <div className="range"></div> {/* Fills the entire width */}
+          <div className="range"></div>
           <div
             className="hoverable-line"
             style={{

@@ -4,7 +4,6 @@
   box-shadow: var(--box-shadow);
   background-color: var(--darker);
   margin: 20px 0;
-  text-align: center;
   color: var(--text-color);
 }
 
@@ -23,6 +22,8 @@
   padding: 10px;
   background-color: var(--dark);
   border-radius: 8px;
+  position: relative;
+  min-width: 400px;
 }
 
 .histogram-bar {
@@ -39,33 +40,18 @@
 
 .bar {
   background-color: var(--darker);
-  width: 100%;
+  width: 20px;
   position: relative;
   transition: all 0.3s ease;
 }
 
 .bar:hover {
-  background-color: var(--accent-color); /* Highlight on hover */
+  background-color: var(--accent-color);
 }
 
 .bar:hover .tooltip {
-  display: block; /* Shows tooltip on hover */
-}
-
-.count-label {
-  position: absolute;
-  bottom: 0.4em;
-  width: 100%;
-  color: var(--text-color);
-  font-size: 0.8rem;
-  left: 0;
-}
-
-.label {
-  margin-top: 5px;
-  font-size: 0.8rem;
-  color: var(--text-color);
-  text-align: center;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Summary Visualization */
@@ -172,6 +158,21 @@
   display: flex;
   justify-content: space-between;
   margin-top: 10px;
+  align-items: center;
+}
+
+/* X-axis label for each bucket */
+.histogram-x-axis {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  margin-left: calc(100% / 10 - 10px);
+}
+
+.x-axis-label {
+  text-align: center;
   color: var(--text-color);
-  font-size: 0.9rem;
+  font-size: 0.8rem;
+  width: calc(100% / 10 - 10px);
 }
