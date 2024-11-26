@@ -39,6 +39,22 @@ const useProcessedData = () => {
             .map((stats) => stats.avgDiscoveryTime || Infinity)
             .reduce((best, current) => Math.min(best, current), Infinity);
 
+          // Store regional stats for avgPrice and avgDiscoveryTime
+          const regionalStats = orchestratorData.regionalStats || {};
+          const avgPriceByRegion = {};
+          const avgDiscoveryTimeByRegion = {};
+          regions.forEach((region) => {
+            const stats = regionalStats[region] || {};
+            avgPriceByRegion[region] = stats.avgPrice || 0;
+            avgDiscoveryTimeByRegion[region] = stats.avgDiscoveryTime || Infinity;
+          });
+          // Store avgRTR per livepeer region
+          const avgRTRByRegion = {};
+          livepeerRegions.forEach((region) => {
+            const leaderboard = leaderboardResults[region] || {};
+            avgRTRByRegion[region] = leaderboard.latestRTR || 0;
+          });
+
           return {
             id: instanceId,
             price: instanceData.price || 0,
@@ -51,6 +67,9 @@ const useProcessedData = () => {
             bestDiscoveryTime: bestDiscoveryTime === Infinity ? null : bestDiscoveryTime,
             avgRTR: avgRTR || 0,
             avgSR: avgSR || 0,
+            avgPriceByRegion,
+            avgDiscoveryTimeByRegion,
+            avgRTRByRegion,
           };
         }
       );

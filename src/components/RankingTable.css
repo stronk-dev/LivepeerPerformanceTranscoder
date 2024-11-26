@@ -77,3 +77,24 @@ td:nth-child(3), th:nth-child(3) {
     width: 25%; /* Adjusts KPI values width */
   }
 }
+
+/* Region Selector Dropdown Styling */
+.region-selector {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.region-selector label {
+  color: var(--text-color);
+  margin-right: 10px;
+}
+
+.region-selector select {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  background-color: var(--input-background);
+  color: var(--text-color);
+  cursor: pointer;
+}
