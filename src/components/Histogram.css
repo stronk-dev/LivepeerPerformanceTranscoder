@@ -1,0 +1,175 @@
+.histogram {
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: var(--box-shadow);
+  background-color: var(--darker);
+  margin: 20px 0;
+  text-align: center;
+  color: var(--text-color);
+}
+
+.histogram h2 {
+  margin-bottom: 15px;
+  color: var(--accent-color);
+  font-size: 1.2rem;
+}
+
+/* Histogram Chart */
+.histogram-chart {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: 200px;
+  padding: 10px;
+  background-color: var(--dark);
+  border-radius: 8px;
+}
+
+.histogram-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: calc(100% / 10 - 10px);
+  background-color: var(--grey);
+  height: 100%;
+  border-radius: 4px;
+  padding: 5px;
+  justify-content: flex-end;
+}
+
+.bar {
+  background-color: var(--darker);
+  width: 100%;
+  position: relative;
+  transition: height 0.3s ease;
+}
+
+.bar:hover {
+  background-color: var(--accent-color); /* Highlight on hover */
+}
+
+.bar:hover .tooltip {
+  display: block; /* Shows tooltip on hover */
+}
+
+.count-label {
+  position: absolute;
+  bottom: 0.4em;
+  width: 100%;
+  color: var(--text-color);
+  font-size: 0.8rem;
+  left: 0;
+}
+
+.label {
+  margin-top: 5px;
+  font-size: 0.8rem;
+  color: var(--text-color);
+  text-align: center;
+}
+
+/* Summary Visualization */
+.summary-visualization {
+  margin-top: 20px;
+  position: relative;
+  width: 100%;
+  height: 80px; /* Increased height for clarity */
+  background-color: var(--dark); /* Adds contrast */
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.summary-bar {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+
+/* Interquartile Range Background */
+.iqr-background {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background-color: var(--darker);
+  z-index: 2;
+  border-radius: 4px;
+}
+
+.range {
+  position: absolute;
+  left: 0; /* Ensures range starts at the beginning */
+  width: 100%; /* Fills the entire summary bar */
+  background-color: var(--button-background);
+  height: 100%;
+  z-index: 1;
+  border-radius: 8px;
+}
+
+.median-label {
+  position: absolute;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hoverable-line {
+  position: absolute;
+  height: 100%;
+  width: 20px; /* Wider hoverable area */
+  top: 0;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hoverable-line:hover .tooltip {
+  display: block; /* Shows tooltip on hover */
+}
+
+.tooltip {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translate(-50%, -0.4em);
+  background-color: var(--accent-color);
+  color: var(--section-background);
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  z-index: 3;
+}
+
+.median,
+.percentile {
+  position: absolute;
+  background-color: var(--accent-color);
+  width: 5px;
+  height: 100%;
+}
+
+.median {
+  z-index: 3;
+}
+
+.percentile {
+  background-color: var(--dark); /* Distinct color for percentile lines */
+}
+
+.percentile:hover {
+  background-color: var(--accent-color); /* Highlight on hover */
+}
+
+.summary-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  color: var(--text-color);
+  font-size: 0.9rem;
+}

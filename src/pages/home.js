@@ -2,6 +2,8 @@ import React, { useRef, useState } from "react";
 import DvdLogo from "../components/DvdLogo";
 import LoadingScreen from "../components/loadingScreen";
 import RankingTable from "../components/RankingTable";
+import Histogram from "../components/Histogram";
+import WorldMap from "../components/WorldMap";
 import useProcessedData from "../hooks/useProcessedData";
 import "./home.css";
 
@@ -9,66 +11,67 @@ const Home = () => {
   const rootContainerRef = useRef(null);
   const { isLoading, isError, processedData } = useProcessedData();
 
-  const [activeTab, setActiveTab] = useState("pricing");
+  const [activeKPI, setKPI] = useState("discovery-time");
+  const [activeView, setView] = useState("map");
 
-  const renderTabContent = () => {
-    const selectedKPI = activeTab === "pricing" ? "avgPrice" :
-      activeTab === "discovery-time" ? "avgDiscoveryTime" :
-        activeTab === "performance" ? "avgRTR" : null;
-    switch (activeTab) {
+  const getTitle = () => {
+    switch (activeKPI) {
       case "pricing":
-        return (
-          <div className="tab-content">
-            <section className="ranking-section">
-              <h3>Pricing Ranking</h3>
-              <RankingTable orchestrators={processedData.orchestrators} selectedKPI={selectedKPI} />
-            </section>
-            <section className="map-section">
-              <h3>Interactive World Map</h3>
-              {/* Placeholder for Map Component */}
-            </section>
-            <section className="histogram-section">
-              <h3>Pricing Histogram</h3>
-              {/* Placeholder for Histogram Component */}
-            </section>
-          </div>
-        );
+        return "Pricing";
       case "discovery-time":
-        return (
-          <div className="tab-content">
-            <section className="ranking-section">
-              <h3>Discovery Time Ranking</h3>
-              <RankingTable orchestrators={processedData.orchestrators} selectedKPI={selectedKPI} />
-            </section>
-            <section className="map-section">
-              <h3>Interactive World Map</h3>
-              {/* Placeholder for Map Component */}
-            </section>
-            <section className="histogram-section">
-              <h3>Discovery Time Histogram</h3>
-              {/* Placeholder for Histogram Component */}
-            </section>
-          </div>
-        );
+        return "Discovery Time";
       case "performance":
-        return (
-          <div className="tab-content">
-            <section className="ranking-section">
-              <h3>Performance Ranking</h3>
-              <RankingTable orchestrators={processedData.orchestrators} selectedKPI={selectedKPI} />
-            </section>
-            <section className="map-section">
-              <h3>Interactive World Map</h3>
-              {/* Placeholder for Map Component */}
-            </section>
-            <section className="histogram-section">
-              <h3>Performance Histogram</h3>
-              {/* Placeholder for Histogram Component */}
-            </section>
-          </div>
-        );
+        return "Performance";
       default:
-        return null;
+        return "UNKOWN";
+    }
+  }
+
+  const renderKPIContent = () => {
+    switch (activeView) {
+      case "table":
+        {
+          const selectedKPI = activeKPI === "pricing" ? "avgPrice" :
+            activeKPI === "discovery-time" ? "avgDiscoveryTime" :
+              activeKPI === "performance" ? "avgRTR" : null;
+          return (
+            <div className="scrollable-content">
+              <div className="tab-content">
+                <section className="ranking-section">
+                  <h3>{getTitle()} Ranking</h3>
+                  <RankingTable orchestrators={processedData.orchestrators} selectedKPI={selectedKPI} />
+                </section>
+              </div>
+            </div>
+          );
+        }
+      case "map":
+        {
+          const selectedKPI = activeKPI === "pricing" ? "normalizedPrice" :
+            activeKPI === "discovery-time" ? "normalizedDiscoveryTime" :
+              activeKPI === "performance" ? "normalizedRTR" : null;
+          return (
+            <div className="tab-content">
+              <WorldMap orchestrators={processedData.orchestrators} selectedKPI={selectedKPI} />
+            </div>
+          );
+        }
+      case "distribution":
+        {
+          const selectedKPI = activeKPI === "pricing" ? "pricing" :
+            activeKPI === "discovery-time" ? "discoveryTime" :
+              activeKPI === "performance" ? "performanceRTR" : null;
+          return (
+            <div className="scrollable-content">
+              <div className="tab-content">
+                <section className="histogram-section">
+                  <h3>{getTitle()} Histogram</h3>
+                  <Histogram aggregateData={processedData.aggregates} selectedKPI={selectedKPI} />
+                </section>
+              </div>
+            </div>
+          );
+        }
     }
   };
 
@@ -87,26 +90,46 @@ const Home = () => {
       <header className="header-bar">
         <div className="tabs">
           <button
-            className={`tab ${activeTab === "pricing" ? "active" : ""}`}
-            onClick={() => setActiveTab("pricing")}
+            className={`tab ${activeKPI === "pricing" ? "active" : ""}`}
+            onClick={() => setKPI("pricing")}
           >
             Pricing
           </button>
           <button
-            className={`tab ${activeTab === "discovery-time" ? "active" : ""}`}
-            onClick={() => setActiveTab("discovery-time")}
+            className={`tab ${activeKPI === "discovery-time" ? "active" : ""}`}
+            onClick={() => setKPI("discovery-time")}
           >
             Discovery Time
           </button>
           <button
-            className={`tab ${activeTab === "performance" ? "active" : ""}`}
-            onClick={() => setActiveTab("performance")}
+            className={`tab ${activeKPI === "performance" ? "active" : ""}`}
+            onClick={() => setKPI("performance")}
           >
             Performance
           </button>
         </div>
+        <div className="tabs">
+          <button
+            className={`tab ${activeView === "table" ? "active" : ""}`}
+            onClick={() => setView("table")}
+          >
+            Ranking
+          </button>
+          <button
+            className={`tab ${activeView === "map" ? "active" : ""}`}
+            onClick={() => setView("map")}
+          >
+            World Map
+          </button>
+          <button
+            className={`tab ${activeView === "distribution" ? "active" : ""}`}
+            onClick={() => setView("distribution")}
+          >
+            Distribution
+          </button>
+        </div>
       </header>
-      <div className="scrollable-content">{renderTabContent()}</div>
+      {renderKPIContent()}
     </div>
   );
 };

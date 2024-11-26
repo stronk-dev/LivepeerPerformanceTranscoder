@@ -49,8 +49,8 @@ const useProcessedData = () => {
             livepeer_regions: livepeerRegions,
             lastPing: lastPing || null,
             bestDiscoveryTime: bestDiscoveryTime === Infinity ? null : bestDiscoveryTime,
-            avgRTR: avgRTR || null,
-            avgSR: avgSR || null,
+            avgRTR: avgRTR || 0,
+            avgSR: avgSR || 0,
           };
         }
       );
@@ -73,15 +73,15 @@ const useProcessedData = () => {
       return {
         id: orchestratorId,
         name: orchestratorData.name,
-        avgPrice: avgPrice || null,
+        avgPrice: avgPrice || 0,
         avgDiscoveryTime: avgDiscoveryTime === Infinity ? null : avgDiscoveryTime,
-        avgRTR: avgRTR || null,
-        avgSR: avgSR || null,
+        avgRTR: avgRTR || 0,
+        avgSR: avgSR || 0,
         instances,
       };
     });
 
-    // Calculate average values for normalization
+    // Calculate average values for normalization across orchestrators
     const avgDiscoveryTime =
       orchestrators.reduce((sum, orchestrator) => sum + (orchestrator.avgDiscoveryTime || 0), 0) /
       orchestrators.length;
@@ -90,7 +90,11 @@ const useProcessedData = () => {
       orchestrators.reduce((sum, orchestrator) => sum + (orchestrator.avgPrice || 0), 0) /
       orchestrators.length;
 
-    // Normalize discovery time and pricing
+    const avgRTR =
+      orchestrators.reduce((sum, orchestrator) => sum + (orchestrator.avgRTR || 0), 0) /
+      orchestrators.length;
+
+    // Normalize discovery time and pricing for orchestrators
     orchestrators.forEach((orchestrator) => {
       orchestrator.normalizedDiscoveryTime =
         orchestrator.avgDiscoveryTime !== null
@@ -100,6 +104,38 @@ const useProcessedData = () => {
       orchestrator.normalizedPrice =
         orchestrator.avgPrice !== null
           ? (avgPrice - orchestrator.avgPrice) / avgPrice
+          : null;
+
+      orchestrator.normalizedRTR =
+        orchestrator.avgRTR !== null
+          ? (avgRTR - orchestrator.avgRTR) / avgRTR
+          : null;
+    });
+
+    // Calculate average values for normalization across instances
+    const allInstances = orchestrators.flatMap((orchestrator) => orchestrator.instances);
+    const avgInstanceDiscoveryTime =
+      allInstances.reduce((sum, inst) => sum + (inst.bestDiscoveryTime || 0), 0) / allInstances.length;
+    const avgInstancePrice =
+      allInstances.reduce((sum, inst) => sum + (inst.price || 0), 0) / allInstances.length;
+    const avgInstanceRTR =
+      allInstances.reduce((sum, inst) => sum + (inst.avgRTR || 0), 0) / allInstances.length;
+
+    // Normalize discovery time and pricing for instances
+    allInstances.forEach((instance) => {
+      instance.normalizedDiscoveryTime =
+        instance.bestDiscoveryTime !== null
+          ? (avgInstanceDiscoveryTime - instance.bestDiscoveryTime) / avgInstanceDiscoveryTime
+          : null;
+
+      instance.normalizedPrice =
+        instance.price !== null
+          ? (avgInstancePrice - instance.price) / avgInstancePrice
+          : null;
+
+      instance.normalizedRTR =
+        instance.avgRTR !== null
+          ? (avgInstanceRTR - instance.avgRTR) / avgInstanceRTR
           : null;
     });
 

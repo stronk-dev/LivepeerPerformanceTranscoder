@@ -6,18 +6,23 @@ const RankingTable = ({ orchestrators, selectedKPI }) => {
   const kpiLabel = {
     avgPrice: "Price",
     avgDiscoveryTime: "Discovery Time",
-    avgRTR: "Performance (RTR)",
-    avgSR: "Performance (SR)",
+    avgRTR: "Realtime ratio",
   };
 
-  const sortedOrchestrators = [...orchestrators].sort((a, b) => {
-    if (!a[selectedKPI] || !b[selectedKPI]) return 0;
-    return a[selectedKPI] - b[selectedKPI];
+  // Validate data
+  const validOrchestrators = orchestrators.filter((orch) =>
+    orch[selectedKPI] !== undefined && orch[selectedKPI] > 0.0
+  );
+
+  const sortedOrchestrators = [...validOrchestrators].sort((a, b) => {
+    const valueA = a[selectedKPI] >= 0 ? a[selectedKPI] : Infinity;
+    const valueB = b[selectedKPI] >= 0 ? b[selectedKPI] : Infinity;
+    return valueA - valueB; // Ascending
   });
 
   return (
     <div className="ranking-table">
-      <h2>Ranking Table</h2>
+      <h4>Ranking Table</h4>
       <table>
         <thead>
           <tr>
@@ -28,11 +33,11 @@ const RankingTable = ({ orchestrators, selectedKPI }) => {
         </thead>
         <tbody>
           {sortedOrchestrators.map((orchestrator, index) => (
-            orchestrator[selectedKPI] !== null && orchestrator[selectedKPI] >= 0.0 && <tr key={orchestrator.id}>
+            <tr key={orchestrator.id}>
               <td>{index + 1}</td>
               <td>{orchestrator.name}</td>
               <td>
-                {orchestrator[selectedKPI].toFixed(2)}
+                {orchestrator[selectedKPI] >= 0 ? orchestrator[selectedKPI]?.toFixed(2) || 0 : "?"}
               </td>
             </tr>
           ))}
@@ -53,7 +58,7 @@ RankingTable.propTypes = {
       avgSR: PropTypes.number,
     })
   ).isRequired,
-  selectedKPI: PropTypes.oneOf(["avgPrice", "avgDiscoveryTime", "avgRTR", "avgSR"]).isRequired,
+  selectedKPI: PropTypes.oneOf(["avgPrice", "avgDiscoveryTime", "avgRTR"]).isRequired,
 };
 
 export default RankingTable;

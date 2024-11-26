@@ -1,26 +1,34 @@
 .ranking-table {
-  background-color: var(--section-background);
+  background-color: var(--darker);
   border-radius: 8px;
   padding: 20px;
   box-shadow: var(--box-shadow);
+  overflow: hidden;
+  width: 100%;
+  margin: 0 auto; /* Centers the table */
 }
 
 .ranking-table h2 {
   margin-bottom: 15px;
   color: var(--accent-color);
+  text-align: center;
 }
 
 .ranking-table table {
   width: 100%;
   border-collapse: collapse;
   font-size: 1rem;
+  table-layout: auto; /* Allows flexible column widths */
 }
 
 .ranking-table th,
 .ranking-table td {
   text-align: left;
   padding: 10px;
-  border-bottom: 1px solid var(--darker);
+  border-bottom: 1px solid var(--grey);
+  overflow: hidden;
+  text-overflow: ellipsis; /* Adds ellipsis for truncated content */
+  white-space: nowrap; /* Prevents wrapping */
 }
 
 .ranking-table th {
@@ -29,7 +37,7 @@
 }
 
 .ranking-table tbody tr:hover {
-  background-color: var(--darker);
+  background-color: var(--dark);
   cursor: pointer;
 }
 
@@ -37,6 +45,35 @@
   color: var(--text-color);
 }
 
-.ranking-table td:first-child {
+td:first-child, th:first-child {
   font-weight: bold;
+  width: 4em; /* Allocates a small width for ranking numbers */
+}
+
+td:nth-child(2), th:nth-child(2) {
+  width: auto; /* Allows the orchestrator name column to expand */
+}
+
+td:nth-child(3), th:nth-child(3) {
+  width: 20%; /* Sets a fixed width for the KPI values */
+}
+
+/* Responsive Styling */
+@media (max-width: 768px) {
+  .ranking-table table {
+    table-layout: fixed; /* Prevents horizontal scrolling */
+  }
+
+  td:first-child, th:first-child {
+    font-weight: normal;
+    font-size: small;
+  }
+
+  td:nth-child(2), th:nth-child(2) {
+    width: 60%; /* Restricts orchestrator name column */
+  }
+
+  td:nth-child(3), th:nth-child(3) {
+    width: 25%; /* Adjusts KPI values width */
+  }
 }

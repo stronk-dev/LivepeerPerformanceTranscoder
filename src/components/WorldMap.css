@@ -1,0 +1,153 @@
+/* Container that holds the entire map and panel section */
+.map-and-panel {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  transition: width 0.3s ease-in-out;
+}
+
+/* World map container styling */
+.world-map-container {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  transition: width 0.3s ease-in-out;
+}
+
+/* Side panel styling */
+.side-panel {
+  width: 30%;
+  height: 100%;
+  background-color: var(--darker);
+  color: var(--text-color);
+  box-shadow: var(--box-shadow);
+  padding: 20px;
+  overflow-y: auto;
+  transition: transform 0.3s ease-in-out;
+  border-left: 1px solid var(--border-color);
+}
+
+/* Scrollbar Styling */
+.side-panel::-webkit-scrollbar {
+  width: 12px;
+}
+
+.side-panel::-webkit-scrollbar-track {
+  background: var(--scrollbar-track-color);
+}
+
+.side-panel::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-color);
+  border-radius: 6px;
+  filter: brightness(0.8);
+}
+
+.side-panel::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover-color);
+}
+
+/* Close button styling */
+.close-button {
+  background-color: var(--button-background);
+  border: none;
+  color: var(--button-text-color);
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  border-radius: 5px;
+}
+
+.close-button:hover {
+  background-color: var(--button-hover-background);
+}
+
+/* Accordion item styling */
+.accordion-item-wrapper {
+  margin-bottom: 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  background-color: var(--section-background);
+}
+
+.accordion-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  cursor: pointer;
+  background-color: var(--button-background);
+  color: var(--heading-color);
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.accordion-item-header:hover {
+  background-color: var(--button-hover-background);
+}
+
+.accordion-item-header strong {
+  overflow: hidden;
+  text-overflow: ellipsis; /* Adds ellipsis for truncated content */
+  white-space: nowrap; /* Prevents wrapping */
+}
+
+.accordion-item-details {
+  padding: 15px;
+  background-color: var(--darker);
+  color: var(--text-color);
+  border-top: 1px solid var(--border-color);
+}
+
+/* Map controls styling */
+.controls {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+}
+
+.controls input[type="text"] {
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  background-color: var(--input-background);
+  color: var(--text-color);
+}
+
+.controls input[type="text"]::placeholder {
+  color: var(--placeholder-color);
+}
+
+/* Custom cluster styling */
+.custom-cluster {
+  transition: transform 0.2s ease;
+}
+
+.custom-cluster:hover {
+  transform: scale(1.1);
+}
+
+/* Custom pin styling */
+.custom-pin {
+  transition: transform 0.2s ease;
+}
+
+.custom-pin:hover {
+  transform: scale(1.1);
+}
+
+/* Probe pin styling */
+.probe-pin {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 3px solid white;
+  background-color: blue;
+  transition: transform 0.2s ease;
+}
+
+.probe-pin:hover {
+  transform: scale(1.1);
+}
