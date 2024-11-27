@@ -29,11 +29,11 @@ const Histogram = ({ aggregateData, selectedKPI }) => {
                 height: `${(bucket.count / maxCount) * 100}%`,
               }}
             >
-              <div className="tooltip">
-                <span>Observations: {bucket.count}</span>
-                <span>Min: {bucket.range[0].toFixed(2)}</span>
-                <span>Max: {bucket.range[1].toFixed(2)}</span>
-              </div>
+            </div>
+            <div className="tooltip">
+              <span>Observations: {bucket.count}</span>
+              <span>Min: {bucket.range[0].toFixed(2)}</span>
+              <span>Max: {bucket.range[1].toFixed(2)}</span>
             </div>
           </div>
         ))}
@@ -44,7 +44,7 @@ const Histogram = ({ aggregateData, selectedKPI }) => {
         <span className="x-axis-label"></span>
         {buckets.map((bucket, index) => (
           <span key={index} className="x-axis-label">
-            {index + 1 < buckets.length && bucket.range[1].toPrecision(3)}
+            {index + 1 < buckets.length ? (bucket.range[1] < 1000 ? bucket.range[1].toPrecision(3) : bucket.range[1].toFixed(0)) : null}
           </span>
         ))}
       </div>
@@ -91,7 +91,7 @@ const Histogram = ({ aggregateData, selectedKPI }) => {
           </div>
         </div>
         <div className="summary-labels">
-          <span>{range[0]?.toFixed(2)}</span>
+          <span className="leftAlign">{range[0]?.toFixed(2)}</span>
           <span
             className="median-label"
             style={{
@@ -100,7 +100,7 @@ const Histogram = ({ aggregateData, selectedKPI }) => {
           >
             {median?.toFixed(2)}
           </span>
-          <span>{range[1]?.toFixed(2)}</span>
+          <span className="rightAlign">{range[1]?.toFixed(2)}</span>
         </div>
       </div>
     </div>

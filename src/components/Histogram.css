@@ -42,6 +42,15 @@
   justify-content: flex-end;
 }
 
+.histogram-bar:hover .bar {
+  background-color: var(--accent-color);
+}
+
+.histogram-bar:hover .tooltip {
+  display: flex;
+  flex-direction: column;
+}
+
 .bar {
   background-color: var(--darker);
   width: 80%;
@@ -49,15 +58,6 @@
   border-top-right-radius: 0.2em;
   position: relative;
   transition: all 0.3s ease;
-}
-
-.bar:hover {
-  background-color: var(--accent-color);
-}
-
-.bar:hover .tooltip {
-  display: flex;
-  flex-direction: column;
 }
 
 /* Summary Visualization */
@@ -101,11 +101,17 @@
 
 .median-label {
   position: absolute;
-  transform: translateY(20px);
+  transform: translateX(-50%);
   z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+@media (max-width: 600px) {
+  .median-label {
+    transform: translate(-50%, 20px);
+  }
 }
 
 .hoverable-line {
@@ -171,19 +177,32 @@
   text-align: center;
 }
 
+.leftAlign {
+  transform: translateX(-50%);
+}
+
+.rightAlign {
+  transform: translateX(50%);
+}
+
 /* Responsive X-axis label handling */
 .histogram-x-axis {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  width: 100%;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
-  width: 100%;
+  flex-wrap: nowrap;
 }
 
 .x-axis-label {
   text-align: center;
   color: var(--text-color);
   font-size: 0.8rem;
+  text-align: center;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 @media (max-width: 600px) {
