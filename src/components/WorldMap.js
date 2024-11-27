@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Tooltip } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import "leaflet/dist/leaflet.css";
 import "react-leaflet-markercluster/dist/styles.min.css";
 import L from "leaflet";
 import "./WorldMap.css";
+import TimeAgo from 'react-timeago';
 
 // Hardcoded probe region pins
 const probeRegions = [
@@ -29,26 +30,30 @@ const AccordionItem = ({ instanceScore, orchObj, instanceObj, startExpanded }) =
       </div>
       {isExpanded && (
         <div className="accordion-item-details">
-          <p>Instance KPI: {instanceScore?.toFixed(2) || "N/A"}</p>
-          <p>Orchestrator Name: {orchObj.name}</p>
-          <p>Orchestrator ID: {orchObj.id}</p>
-          <p>Average Discovery Time: {orchObj.avgDiscoveryTime}</p>
-          <p>Average Price: {orchObj.avgPrice}</p>
-          <p>Average RTR: {orchObj.avgRTR}</p>
-          <p>Average SR: {orchObj.avgSR}</p>
-          <p>Normalized Discovery Time: {orchObj.normalizedDiscoveryTime}</p>
-          <p>Normalized Price: {orchObj.normalizedPrice}</p>
-          <p>Normalized RTR: {orchObj.normalizedRTR}</p>
-          <p>Instance Average RTR: {instanceObj.avgRTR}</p>
-          <p>Instance Average SR: {instanceObj.avgSR}</p>
-          <p>Instance ID: {instanceObj.id}</p>
-          <p>Instance Last Ping: {instanceObj.lastPing}</p>
-          <p>Instance Normalized Discovery Time: {instanceObj.normalizedDiscoveryTime}</p>
-          <p>Instance Normalized Price: {instanceObj.normalizedPrice}</p>
-          <p>Instance Normalized RTR: {instanceObj.normalizedRTR}</p>
-          <p>Instance Price: {instanceObj.price}</p>
-          <p>Instance Probed From: {instanceObj.probedFrom}</p>
-          <p>Instance Regions: {instanceObj.regions}</p>
+          <p>Address: {orchObj.id}</p>
+          {orchObj.name != orchObj.id && <p>ENS: {orchObj.name}</p>}
+          <div><strong>KPI score:</strong> {instanceScore.toFixed(4) * 100}%</div>
+          <hr />
+          <strong>Global Stats:</strong>
+          <p>Discovery Time: {orchObj.avgDiscoveryTime.toPrecision(3)} ms</p>
+          <p>Price: {orchObj.avgPrice.toPrecision(3)}</p>
+          <p>RTR: {orchObj.avgRTR.toFixed(1)}</p>
+          <p>SR: {orchObj.avgSR.toFixed(1)}</p>
+          <hr />
+          <strong>Instance Stats:</strong>
+          <p>IP: {instanceObj.id}</p>
+          <div>Last Ping: <TimeAgo
+            date={instanceObj.lastPing}
+            component={"p"}
+            minPeriod={60}
+            style={{}}
+          /></div>
+          <p>Discovery Time: {instanceObj.bestDiscoveryTime.toPrecision(3)} ms</p>
+          <p>Price: {instanceObj.price.toPrecision(3)}</p>
+          <p>RTR: {instanceObj.avgRTR.toFixed(1)}</p>
+          <p>SR: {instanceObj.avgSR.toFixed(1)}</p>
+          <hr />
+          <div><strong>Probed From:</strong> {instanceObj.probedFrom.map((location) => <p>{location}</p>)}</div>
         </div>
       )}
     </div>
@@ -187,7 +192,17 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
               clusterclick: (e) => {
                 const cluster = e.layer;
                 const markers = cluster.getAllChildMarkers();
-                setSelectedData(markers);
+                if (!selectedData || !Array.isArray(selectedData)) {
+                  setSelectedData(markers);
+                  return;
+                }
+                const notChanged = Array.isArray(selectedData) && selectedData.length == markers.length &&
+                  selectedData.every((marker, index) => marker._leaflet_id === markers[index]._leaflet_id) || false;
+                if (!notChanged) {
+                  setSelectedData(markers);
+                } else {
+                  setSelectedData(null);
+                }
               },
             }}
           >
@@ -204,7 +219,7 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
                   icon={L.divIcon({
                     className: "dummy",
                     html: `<div class="custom-pin" style="background-color: ${selectedData?.instanceObj?.id === instance.id ? "var(--magenta)" :
-                        getPinColor(instance[selectedKPI])
+                      getPinColor(instance[selectedKPI])
                       }; width: ${selectedData?.instanceObj?.id === instance.id ? "36px" :
                         "24px"
                       }; height: ${selectedData?.instanceObj?.id === instance.id ? "36px" :
@@ -213,14 +228,24 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
                   })}
                   eventHandlers={{
                     click: () => {
-                      setSelectedData({
-                        instanceScore: instance[selectedKPI],
-                        orchObj: orch,
-                        instanceObj: instance,
-                      });
+                      if (!selectedData || Array.isArray(selectedData) || selectedData.instanceObj.id != instance.id) {
+                        setSelectedData({
+                          instanceScore: instance[selectedKPI],
+                          orchObj: orch,
+                          instanceObj: instance,
+                        });
+                      } else {
+                        setSelectedData(null);
+                      }
                     },
                   }}
-                />
+                >
+                  <Tooltip>
+                    <strong>{instance.id}</strong>
+                    <br />
+                    Orchestrator node
+                  </Tooltip>
+                </Marker>
               ))
             )}
           </MarkerClusterGroup>
@@ -235,11 +260,11 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
                 html: `<div class="probe-pin""></div>`,
               })}
             >
-              <Popup>
+              <Tooltip>
                 <strong>{region.name}</strong>
                 <br />
                 Stronk Origin
-              </Popup>
+              </Tooltip>
             </Marker>
           ))}
         </MapContainer>
