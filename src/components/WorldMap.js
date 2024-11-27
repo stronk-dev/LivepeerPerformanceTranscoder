@@ -207,19 +207,21 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
   );
 
   return (
-    <div className="world-map-container">
-      {/* Search Bar */}
-      <div className="controls">
-        <input
-          type="text"
-          placeholder="Search orchestrators..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
+    <div className="map-and-panel">
+      <div
+        className={`world-map-container ${selectedData ? "sidebar-open" : ""
+          }`}
+      >
+        {/* Search Bar */}
+        <div className="controls">
+          <input
+            type="text"
+            placeholder="Search orchestrators..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
 
-      {/* Map and Side Panel */}
-      <div className="map-and-panel">
         {/* Map Component */}
         <MapContainer
           zoom={4}
@@ -319,10 +321,12 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
             </Marker>
           ))}
         </MapContainer>
-
-        {/* Side Panel */}
-        <SidePanel selectedData={selectedData} onClose={() => setSelectedData(null)} />
       </div>
+
+      {/* Side Panel */}
+      {selectedData && (
+        <SidePanel selectedData={selectedData} onClose={() => setSelectedData(null)} />
+      )}
     </div>
   );
 };

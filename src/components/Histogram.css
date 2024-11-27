@@ -1,3 +1,4 @@
+/* Updated histogram chart and bar styling */
 .histogram {
   border-radius: 8px;
   padding: 20px;
@@ -5,6 +6,7 @@
   background-color: var(--darker);
   margin: 20px 0;
   color: var(--text-color);
+  width: 100%;
 }
 
 .histogram h2 {
@@ -16,31 +18,35 @@
 /* Histogram Chart */
 .histogram-chart {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-evenly; /* Ensures bars are spaced evenly */
   align-items: flex-end;
   height: 200px;
   padding: 10px;
   background-color: var(--dark);
   border-radius: 8px;
   position: relative;
-  min-width: 400px;
+  width: 100%;
+  flex-wrap: nowrap; /* Prevents wrapping */
 }
 
 .histogram-bar {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: calc(100% / 10 - 10px);
+  flex: 1;
+  margin: 0 5px; /* Adds spacing between bars */
+  padding-top: 5px;
   background-color: var(--grey);
   height: 100%;
   border-radius: 4px;
-  padding: 5px;
   justify-content: flex-end;
 }
 
 .bar {
   background-color: var(--darker);
-  width: 20px;
+  width: 80%;
+  border-top-left-radius: 0.2em;
+  border-top-right-radius: 0.2em;
   position: relative;
   transition: all 0.3s ease;
 }
@@ -60,7 +66,7 @@
   position: relative;
   width: 100%;
   height: 80px; /* Increased height for clarity */
-  background-color: var(--dark); /* Adds contrast */
+  background-color: var(--dark);
   border-radius: 8px;
   padding: 10px;
 }
@@ -85,8 +91,8 @@
 
 .range {
   position: absolute;
-  left: 0; /* Ensures range starts at the beginning */
-  width: 100%; /* Fills the entire summary bar */
+  left: 0;
+  width: 100%;
   background-color: var(--button-background);
   height: 100%;
   z-index: 1;
@@ -95,7 +101,7 @@
 
 .median-label {
   position: absolute;
-  transform: translateX(-50%);
+  transform: translateY(20px);
   z-index: 2;
   display: flex;
   align-items: center;
@@ -116,7 +122,7 @@
 }
 
 .hoverable-line:hover .tooltip {
-  display: block; /* Shows tooltip on hover */
+  display: block;
 }
 
 .tooltip {
@@ -147,11 +153,11 @@
 }
 
 .percentile {
-  background-color: var(--dark); /* Distinct color for percentile lines */
+  background-color: var(--dark);
 }
 
 .percentile:hover {
-  background-color: var(--accent-color); /* Highlight on hover */
+  background-color: var(--accent-color);
 }
 
 .summary-labels {
@@ -161,18 +167,27 @@
   align-items: center;
 }
 
-/* X-axis label for each bucket */
+.summary-labels span {
+  text-align: center;
+}
+
+/* Responsive X-axis label handling */
 .histogram-x-axis {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: 10px;
-  margin-left: calc(100% / 10 - 10px);
+  width: 100%;
 }
 
 .x-axis-label {
   text-align: center;
   color: var(--text-color);
   font-size: 0.8rem;
-  width: calc(100% / 10 - 10px);
+}
+
+@media (max-width: 600px) {
+  .x-axis-label:nth-child(odd) {
+    display: none; /* Hide every other label on small screens */
+  }
 }

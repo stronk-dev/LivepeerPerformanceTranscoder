@@ -37,13 +37,11 @@ const Home = () => {
               activeKPI === "performance" ? "avgRTR" : null;
           return (
             <div className="scrollable-content">
-              <div className="tab-content">
                 <section className="ranking-section">
                   <h4>{getTitle()} Ranking</h4>
                   {activeKPI == "pricing" ? <span>(for 1 hour of 1080p 30fps, assuming 1 ETH = 3000 USD)</span> : ""}
                   <RankingTable orchestrators={processedData.orchestrators} selectedKPI={selectedKPI} />
                 </section>
-              </div>
             </div>
           );
         }
@@ -53,9 +51,7 @@ const Home = () => {
             activeKPI === "discovery-time" ? "normalizedDiscoveryTime" :
               activeKPI === "performance" ? "normalizedRTR" : null;
           return (
-            <div className="tab-content">
               <WorldMap orchestrators={processedData.orchestrators} selectedKPI={selectedKPI} />
-            </div>
           );
         }
       case "distribution":
@@ -65,12 +61,10 @@ const Home = () => {
               activeKPI === "performance" ? "performanceRTR" : null;
           return (
             <div className="scrollable-content">
-              <div className="tab-content">
                 <section className="histogram-section">
                   <h4>{getTitle()} Charts</h4>
                   <Histogram aggregateData={processedData.aggregates} selectedKPI={selectedKPI} />
                 </section>
-              </div>
             </div>
           );
         }
@@ -96,44 +90,45 @@ const Home = () => {
             onClick={() => setKPI("pricing")}
           >
             <FaDollarSign className="tab-icon" />
-            Pricing
+            <p>Price</p>
           </button>
           <button
             className={`tab ${activeKPI === "discovery-time" ? "active" : ""}`}
             onClick={() => setKPI("discovery-time")}
           >
             <FaClock className="tab-icon" />
-            Discovery Time
+            <p>Discovery</p>
           </button>
           <button
             className={`tab ${activeKPI === "performance" ? "active" : ""}`}
             onClick={() => setKPI("performance")}
           >
             <FaChartLine className="tab-icon" />
-            Performance
+            <p>Performance</p>
           </button>
         </div>
+        <div className="separator"></div>
         <div className="tabs">
           <button
             className={`tab ${activeView === "table" ? "active" : ""}`}
             onClick={() => setView("table")}
           >
             <FaTable className="tab-icon" />
-            Ranking
+            <p>Rank</p>
           </button>
           <button
             className={`tab ${activeView === "map" ? "active" : ""}`}
             onClick={() => setView("map")}
           >
             <FaMap className="tab-icon" />
-            World Map
+            <p>Map</p>
           </button>
           <button
             className={`tab ${activeView === "distribution" ? "active" : ""}`}
             onClick={() => setView("distribution")}
           >
             <FaChartBar className="tab-icon" />
-            Distribution
+            <p>Chart</p>
           </button>
         </div>
       </header>

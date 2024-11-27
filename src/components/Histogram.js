@@ -26,7 +26,7 @@ const Histogram = ({ aggregateData, selectedKPI }) => {
   return (
     <div className="histogram">
       {/* Histogram Chart */}
-      <h4>{`Histogram for ${kpiLabels[selectedKPI] || selectedKPI}`}</h4>
+      <h4>Histogram</h4>
       <div className="histogram-chart">
         {buckets.map((bucket, index) => (
           <div key={index} className="histogram-bar">
@@ -48,15 +48,16 @@ const Histogram = ({ aggregateData, selectedKPI }) => {
 
       {/* X-axis labels for histogram buckets */}
       <div className="histogram-x-axis">
+        <span className="x-axis-label"></span>
         {buckets.map((bucket, index) => (
           <span key={index} className="x-axis-label">
-            {index + 1< buckets.length && bucket.range[1].toFixed(1)}
+            {index + 1 < buckets.length && bucket.range[1].toPrecision(3)}
           </span>
         ))}
       </div>
 
       {/* Median, Percentiles, and Range Visualization */}
-      <h4>{`Boxplot for ${kpiLabels[selectedKPI] || selectedKPI}`}</h4>
+      <h4>Box plot</h4>
       <div className="summary-visualization">
         <div className="summary-bar">
           {/* Background for the interquartile range (between 25th and 75th percentiles) */}
@@ -102,7 +103,10 @@ const Histogram = ({ aggregateData, selectedKPI }) => {
             className="median-label"
             style={{
               left: `${((median - range[0]) / (range[1] - range[0])) * 100}%`,
-            }}>{median?.toFixed(2)}</span>
+            }}
+          >
+            {median?.toFixed(2)}
+          </span>
           <span>{range[1]?.toFixed(2)}</span>
         </div>
       </div>

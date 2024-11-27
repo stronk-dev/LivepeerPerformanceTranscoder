@@ -55,7 +55,7 @@ td:nth-child(2), th:nth-child(2) {
 }
 
 td:nth-child(3), th:nth-child(3) {
-  width: 20%; /* Sets a fixed width for the KPI values */
+  width: 6em; /* Sets a fixed width for the KPI values */
 }
 
 /* Responsive Styling */
@@ -67,14 +67,6 @@ td:nth-child(3), th:nth-child(3) {
   td:first-child, th:first-child {
     font-weight: normal;
     font-size: small;
-  }
-
-  td:nth-child(2), th:nth-child(2) {
-    width: 60%; /* Restricts orchestrator name column */
-  }
-
-  td:nth-child(3), th:nth-child(3) {
-    width: 25%; /* Adjusts KPI values width */
   }
 }
 
