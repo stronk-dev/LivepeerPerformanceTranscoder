@@ -103,17 +103,17 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
   };
 
   // Helper to determine pin color based on KPI score
-  const getPinColor = (score, isSelected) => {
-    if (isSelected) return 'yellow'; // Highlight selected item with yellow
+  const getPinColor = (score) => {
     if (score === null || score === undefined || score <= 0) return "gray"; // Default for missing data
     const normalized = Math.min(Math.max(score, 0), 1); // Normalize to [0, 1]
     return interpolateColor(normalized);
   };
 
   // Custom cluster icon
-  const createClusterCustomIcon = (cluster, isSelected) => {
+  const createClusterCustomIcon = (cluster) => {
     const childCount = cluster.getChildCount();
     const childMarkers = cluster.getAllChildMarkers();
+
     const avgScore = (
       childMarkers
         .map((marker) => {
@@ -125,8 +125,8 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
         .reduce((sum, score) => sum + score, 0) / childCount
     ).toFixed(2);
 
-    const size = Math.min(20 + childCount * 2, 80);
-    const color = getPinColor(avgScore, isSelected);
+    let size = Math.min(20 + childCount * 2, 80);
+    const color = getPinColor(avgScore);
 
     return L.divIcon({
       className: "dummy",
@@ -182,7 +182,7 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
             showCoverageOnHover={false}
             spiderfyOnMaxZoom={false}
             zoomToBoundsOnClick={false}
-            iconCreateFunction={(cluster) => createClusterCustomIcon(cluster, cluster?.layer?.getAllChildMarkers() === selectedData || false)}
+            iconCreateFunction={(cluster) => createClusterCustomIcon(cluster)}
             eventHandlers={{
               clusterclick: (e) => {
                 const cluster = e.layer;
@@ -203,12 +203,13 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
                   }}
                   icon={L.divIcon({
                     className: "dummy",
-                    html: `<div class="custom-pin" style="background-color: ${getPinColor(
-                      instance[selectedKPI],
-                      selectedData?.instanceScore === instance[selectedKPI] &&
-                      selectedData?.orchObj === instance?.orchObj &&
-                      selectedData?.instanceObj === instance?.instanceObj
-                    )}; width: 24px; height: 24px; border-radius: 50%;"></div>`,
+                    html: `<div class="custom-pin" style="background-color: ${selectedData?.instanceObj?.id === instance.id ? "var(--magenta)" :
+                        getPinColor(instance[selectedKPI])
+                      }; width: ${selectedData?.instanceObj?.id === instance.id ? "36px" :
+                        "24px"
+                      }; height: ${selectedData?.instanceObj?.id === instance.id ? "36px" :
+                        "24px"
+                      }; border-radius: 50%;"></div>`,
                   })}
                   eventHandlers={{
                     click: () => {
