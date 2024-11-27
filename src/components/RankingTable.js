@@ -13,8 +13,8 @@ const RankingTable = ({ orchestrators, selectedKPI }) => {
 
   const kpiLabel = {
     avgPrice: "Price",
-    avgDiscoveryTime: "Discovery Time",
-    avgRTR: "Realtime Ratio",
+    avgDiscoveryTime: "Time",
+    avgRTR: "Ratio",
   };
 
   // Extract unique regions for dropdown options

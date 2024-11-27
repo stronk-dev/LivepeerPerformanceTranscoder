@@ -16,13 +16,6 @@ const Histogram = ({ aggregateData, selectedKPI }) => {
     range: [],
   };
 
-  const kpiLabels = {
-    pricing: "Pricing",
-    discoveryTime: "Discovery Time",
-    performanceRTR: "Realtime Ratio",
-    performanceSR: "Success Rate",
-  };
-
   return (
     <div className="histogram">
       {/* Histogram Chart */}

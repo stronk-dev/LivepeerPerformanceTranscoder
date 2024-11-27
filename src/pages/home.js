@@ -18,11 +18,11 @@ const Home = () => {
   const getTitle = () => {
     switch (activeKPI) {
       case "pricing":
-        return "Pricing";
+        return "Pricing (PPP)";
       case "discovery-time":
-        return "Discovery Time";
+        return "Discovery Time (MS)";
       case "performance":
-        return "Performance";
+        return "Performance (RTR)";
       default:
         return "UNKOWN";
     }
