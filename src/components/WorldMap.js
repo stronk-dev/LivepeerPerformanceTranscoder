@@ -13,14 +13,14 @@ const serverIconHTML = ReactDOMServer.renderToString(<FaServer />);
 
 // Hardcoded probe region pins
 const probeRegions = [
-  { name: "US West", latitude: 34.04805, longitude: -118.25419 },
-  { name: "US East", latitude: 44.933746, longitude: -84.525240 },
-  { name: "EU West", latitude: 52.378, longitude: 4.9 },
-  { name: "India", latitude: 19.077793, longitude: 72.878723 },
-  { name: "South America", latitude: -23.552139, longitude: -46.647198 },
-  { name: "South-East Asia", latitude: 1.351616, longitude: 103.808053 },
-  { name: "Oceania", latitude: -33.868728, longitude: 151.206953 },
-  { name: "Japan", latitude: 35.764784, longitude: 139.148599 },
+  { name: "US West", latitude: 33.947479, longitude: -118.339828 },
+  { name: "US East", latitude: 40.919570, longitude: -73.864723 },
+  { name: "EU West", latitude: 52.362291, longitude: 4.883001 },
+  { name: "India", latitude: 19.015515, longitude: 72.851424 },
+  { name: "South America", latitude: -23.561338, longitude: -46.680156 },
+  { name: "South-East Asia", latitude: 1.255284, longitude: 103.820197 },
+  { name: "Oceania", latitude: -33.868910, longitude: 151.192494 },
+  { name: "Japan", latitude: 35.595941, longitude: 139.745076 },
 ];
 
 // Component to render a single accordion item with full details
@@ -231,7 +231,7 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
         <MapContainer
           zoom={4}
           center={[52.378, 4.9]}
-          maxZoom={10}
+          maxZoom={12}
           minZoom={2}
           style={{ height: "100%", width: "100%" }}
         >
