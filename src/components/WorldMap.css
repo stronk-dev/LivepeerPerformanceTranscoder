@@ -86,21 +86,53 @@
   background-color: var(--button-hover-background);
 }
 
-.accordion-item-header strong {
-  overflow: hidden;
-  text-overflow: ellipsis; /* Adds ellipsis for truncated content */
-  white-space: nowrap; /* Prevents wrapping */
-}
-
 .accordion-item-details {
-  overflow: hidden;
-  text-overflow: ellipsis; /* Adds ellipsis for truncated content */
-  white-space: nowrap; /* Prevents wrapping */
-  margin-top: 0.2em;
-  padding: 0;
+  padding: 15px;
   background-color: var(--darker);
   color: var(--text-color);
   border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.accordion-item-details strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.accordion-item-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-key {
+  font-weight: bold;
+  flex: 1;
+  text-align: left;
+}
+
+.item-value {
+  flex: 2;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.accordion-section-title {
+  font-weight: bold;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  color: var(--heading-color);
 }
 
 /* Map controls styling */
