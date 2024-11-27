@@ -259,6 +259,36 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
                   setSelectedData(null);
                 }
               },
+              clustermouseover: (e) => {
+                const cluster = e.layer;
+                const count = cluster.getChildCount();
+                const markers = cluster.getAllChildMarkers();
+
+                const avgScore = (
+                  markers
+                    .map((marker) => {
+                      const instanceScore = marker.options.options.instanceScore;
+                      return instanceScore !== null && instanceScore !== undefined
+                        ? Math.min(Math.max(instanceScore, 0), 1)
+                        : 0;
+                    })
+                    .reduce((sum, score) => sum + score, 0) / count
+                );
+
+                const tooltipContent = ReactDOMServer.renderToString(
+                  <div>
+                    <strong>Orchestrator cluster</strong>
+                    <br />
+                    {count} instances
+                    <br />
+                    Averaging a score of {(avgScore * 100).toFixed(1)}%
+                  </div>
+                );
+                e.propagatedFrom.bindTooltip(tooltipContent).openTooltip();
+              },
+              clustermouseout: (e) => {
+                e.propagatedFrom.unbindTooltip();
+              },
             }}
           >
             {filteredOrchestrators.map((orch) =>
@@ -294,9 +324,11 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
                   }}
                 >
                   <Tooltip>
-                    <strong>{instance.id}</strong>
+                    <strong>Orchestrator node</strong>
                     <br />
-                    Orchestrator node
+                    {instance.id}
+                    <br />
+                    Averaging a score of {(instance[selectedKPI] * 100).toFixed(1)}%
                   </Tooltip>
                 </Marker>
               ))
@@ -314,9 +346,9 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
               })}
             >
               <Tooltip>
-                <strong>{region.name}</strong>
+                <strong>Stronk Origin</strong>
                 <br />
-                Stronk Origin
+                {region.name}
               </Tooltip>
             </Marker>
           ))}
