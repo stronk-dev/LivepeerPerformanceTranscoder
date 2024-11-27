@@ -36,39 +36,25 @@ const AccordionItem = ({ instanceScore, orchObj, instanceObj, startExpanded }) =
         <div className="accordion-expanded-details" style={{marginTop: "5px"}}>
           <strong>{orchObj.id}</strong>
           <div className="accordion-item-row">
-            <span className="item-key">KPI Score:</span>
-            <span className="item-value">{(instanceScore * 100).toFixed(1)}%</span>
-          </div>
-          <hr />
-          <div className="accordion-section-title">Global Stats:</div>
-          <div className="accordion-item-row">
-            <span className="item-key">Discovery Time:</span>
-            <span className="item-value">{orchObj.avgDiscoveryTime.toPrecision(3)} ms</span>
-          </div>
-          <div className="accordion-item-row">
-            <span className="item-key">Price:</span>
-            <span className="item-value">{orchObj.avgPrice.toPrecision(3)} PPP</span>
-          </div>
-          <div className="accordion-item-row">
-            <span className="item-key">RTR:</span>
-            <span className="item-value">{orchObj.avgRTR.toFixed(1)}</span>
-          </div>
-          <div className="accordion-item-row">
-            <span className="item-key">SR:</span>
-            <span className="item-value">{(orchObj.avgSR * 100).toFixed(1)}%</span>
-          </div>
-          <hr />
-          <div className="accordion-section-title">Instance Stats:</div>
-          <div className="accordion-item-row">
-            <span className="item-key">IP:</span>
-            <span className="item-value">{instanceObj.id}</span>
-          </div>
-          <div className="accordion-item-row">
             <span className="item-key">Last Ping:</span>
             <span className="item-value">
               <TimeAgo date={instanceObj.lastPing} component={"p"} minPeriod={60} />
             </span>
           </div>
+          <div className="accordion-item-row">
+            <span className="item-key">Pricing Score:</span>
+            <span className="item-value">{(instanceObj.normalizedPrice * 100).toFixed(1)}%</span>
+          </div>
+          <div className="accordion-item-row">
+            <span className="item-key">Discovery Score:</span>
+            <span className="item-value">{(instanceObj.normalizedDiscoveryTime * 100).toFixed(1)}%</span>
+          </div>
+          <div className="accordion-item-row">
+            <span className="item-key">Performance Score:</span>
+            <span className="item-value">{(instanceObj.normalizedRTR * 100).toFixed(1)}%</span>
+          </div>
+          <hr />
+          <div className="accordion-section-title">Instance Stats:</div>
           <div className="accordion-item-row">
             <span className="item-key">Discovery Time:</span>
             <span className="item-value">{instanceObj.bestDiscoveryTime.toPrecision(3)} ms</span>
@@ -78,15 +64,34 @@ const AccordionItem = ({ instanceScore, orchObj, instanceObj, startExpanded }) =
             <span className="item-value">{instanceObj.price.toPrecision(3)} PPP</span>
           </div>
           <div className="accordion-item-row">
-            <span className="item-key">RTR:</span>
-            <span className="item-value">{instanceObj.avgRTR.toFixed(1)}</span>
+            <span className="item-key">RTRatio:</span>
+            <span className="item-value">{instanceObj.avgRTR.toFixed(2)}</span>
           </div>
           <div className="accordion-item-row">
-            <span className="item-key">SR:</span>
-            <span className="item-value">{(instanceObj.avgSR * 100).toFixed(1)}%</span>
+            <span className="item-key">SRate:</span>
+            <span className="item-value">{(instanceObj.avgSR * 100).toFixed(2)}%</span>
           </div>
           <hr />
-          <div><strong>Probed From:</strong> {instanceObj.probedFrom.map((location) => <p key={instanceObj.id + location}>{location}</p>)}</div>
+          <div className="accordion-section-title">Orchestrator averages:</div>
+          <div className="accordion-item-row">
+            <span className="item-key">Discovery Time:</span>
+            <span className="item-value">{orchObj.avgDiscoveryTime.toPrecision(3)} ms</span>
+          </div>
+          <div className="accordion-item-row">
+            <span className="item-key">Price:</span>
+            <span className="item-value">{orchObj.avgPrice.toPrecision(3)} PPP</span>
+          </div>
+          <div className="accordion-item-row">
+            <span className="item-key">RTRatio:</span>
+            <span className="item-value">{orchObj.avgRTR.toFixed(2)}</span>
+          </div>
+          <div className="accordion-item-row">
+            <span className="item-key">SRate:</span>
+            <span className="item-value">{(orchObj.avgSR * 100).toFixed(2)}%</span>
+          </div>
+          <hr />
+          <div className="accordion-section-title">Probed From:</div>
+          <div>{instanceObj.probedFrom.map((location) => <p key={instanceObj.id + location}>{location}</p>)}</div>
         </div>
       )}
     </div>

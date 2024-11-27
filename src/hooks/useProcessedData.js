@@ -42,8 +42,14 @@ const useProcessedData = () => {
             return sum + (leaderboardResults[region]?.latestSR || 0);
           }, 0) / (validLivepeerRegionsForRTR.length || 1);
 
-          const bestDiscoveryTime = Object.values(orchestratorData.regionalStats || {})
-            .map((stats) => stats.avgDiscoveryTime || Infinity)
+          const validDiscoveryTimeRegions = probedFrom.filter((region) =>
+            orchestratorData.regionalStats[region]?.avgDiscoveryTime !== undefined &&
+            orchestratorData.regionalStats[region]?.avgDiscoveryTime !== Infinity &&
+            orchestratorData.regionalStats[region].avgDiscoveryTime > 0
+          );
+
+          const bestDiscoveryTime = Object.values(validDiscoveryTimeRegions)
+            .map((region) => orchestratorData.regionalStats[region]?.avgDiscoveryTime || Infinity)
             .reduce((best, current) => Math.min(best, current), Infinity);
 
           return {
