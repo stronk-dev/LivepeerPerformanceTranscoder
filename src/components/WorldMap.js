@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Tooltip } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import "leaflet/dist/leaflet.css";
@@ -155,6 +155,11 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedData, setSelectedData] = useState(null);
 
+  // Set initial position once when parentRef becomes available
+  useEffect(() => {
+    setSelectedData(null);
+  }, [selectedKPI]);
+
   const interpolateColor = (score) => {
     const startColor = [247, 118, 142];
     const endColor = [115, 218, 202];
@@ -221,7 +226,7 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
           center={[52.378, 4.9]}
           maxZoom={10}
           minZoom={2}
-          style={{ height: "100%", width: selectedData ? "70%" : "100%" }} // Adjust width based on side panel
+          style={{ height: "100%", width: "100%" }}
         >
           {/* Dark Theme Tiles */}
           <TileLayer
