@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Tooltip } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import "leaflet/dist/leaflet.css";
@@ -162,6 +162,7 @@ const SidePanel = ({ selectedData, onClose }) => {
 };
 
 const WorldMap = ({ orchestrators, selectedKPI }) => {
+  const searchInputRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedData, setSelectedData] = useState(null);
 
@@ -169,6 +170,32 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
   useEffect(() => {
     setSelectedData(null);
   }, [selectedKPI]);
+
+  // Focus on the search bar automatically when a key is pressed
+  useEffect(() => {
+    const handleKeydown = (event) => {
+      if (
+        document.activeElement !== searchInputRef.current &&
+        !event.metaKey &&
+        !event.ctrlKey &&
+        !event.altKey
+      ) {
+        searchInputRef.current.focus();
+        setSearchTerm("");
+      }
+      if (event.key === 'Escape') {
+        setSearchTerm("");
+        if (searchInputRef.current) {
+          searchInputRef.current.blur(); // Remove focus from the search bar
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeydown);
+    return () => {
+      window.removeEventListener("keydown", handleKeydown);
+    };
+  }, []);
 
   const interpolateColor = (score) => {
     const startColor = [247, 118, 142];
@@ -216,6 +243,8 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
     orch.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const filterIsGood = filteredOrchestrators.length > 0;
+
   return (
     <div className="map-and-panel">
       <div
@@ -229,6 +258,8 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
             placeholder="Search orchestrators..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            className={`search-bar ${filterIsGood ? "" : "search-error"}`}
+            ref={searchInputRef}
           />
         </div>
 
@@ -249,7 +280,7 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
 
           {/* Clustered Markers */}
           <MarkerClusterGroup
-            key={"map-" + selectedKPI}
+            key={"map-" + selectedKPI + searchTerm}
             showCoverageOnHover={false}
             spiderfyOnMaxZoom={false}
             zoomToBoundsOnClick={false}

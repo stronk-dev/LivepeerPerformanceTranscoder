@@ -213,24 +213,52 @@ hr {
 /* Map controls styling */
 .controls {
   position: absolute;
-  bottom: 20px;
-  left: 20px;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 1000;
-  background-color: var(--darkest);
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  pointer-events: none; /* Allows clicking through other parts of the map */
 }
 
-.controls input[type="text"] {
-  padding: 10px;
-  font-size: 14px;
-  border-radius: 5px;
-  border: 1px solid var(--darker);
-  background-color: var(--dark);
-  color: var(--text-color);
+.search-bar {
+  width: 100%;
+  max-width: 600px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  margin-left: 1em;
+  margin-right: 1em;
+  background-color: var(--darker);
+  color: var(--lightest);
+  border: 2px solid var(--dark);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.3s ease;
+  pointer-events: auto; /* Ensures the search bar is interactive */
 }
 
-.controls input[type="text"]::placeholder {
-  color: var(--placeholder-color);
+.search-bar:focus {
+  border-color: var(--blue);
 }
+
+.search-error {
+  border-color: var(--red);
+}
+
+.search-error:focus {
+  border-color: var(--orange);
+}
+
+@media (max-width: 768px) {
+  .search-bar {
+    width: calc(100% - 1em);
+    font-size: 0.9rem;
+    padding: 0.5rem;
+  }
+}
+
 
 /* Custom pin styling */
 .custom-pin {

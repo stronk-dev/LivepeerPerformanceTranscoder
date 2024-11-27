@@ -10,6 +10,7 @@ const useProcessedData = () => {
     if (!apiData || typeof apiData !== 'object') {
       throw new Error('Invalid API data: Ensure data is correctly fetched and parsed.');
     }
+    console.log("Processing: populating orchestrator instances...");
 
     const perRegionStats = {};
     const orchestrators = Object.entries(apiData).map(([orchestratorId, orchestratorData]) => {
@@ -144,6 +145,7 @@ const useProcessedData = () => {
         bestRTRByRegion,
       };
     });
+    console.log("Processing: normalizing KPIs...");
 
     // Calculate average values for normalization across orchestrators
     const allDiscoveryTimes = orchestrators.map((orchestrator) => orchestrator.avgDiscoveryTime).filter((time) => time !== null && time !== Infinity && time > 0.0);
@@ -204,6 +206,8 @@ const useProcessedData = () => {
           : null;
     });
 
+    console.log("Processing: calculating regionwide stats...");
+
     // Process per-region stats
     Object.entries(apiData).forEach(([orchestratorId, orchestratorData]) => {
       Object.entries(orchestratorData.regionalStats || {}).forEach(([region, stats]) => {
@@ -221,6 +225,8 @@ const useProcessedData = () => {
         perRegionStats[region].count++;
       });
     });
+
+    console.log("Processing: calculating buckets and percentiles...");
 
     // Calculate global buckets and percentiles
     const priceBuckets = createBuckets(allInstancePrices, 10);
@@ -311,6 +317,7 @@ const useProcessedData = () => {
     async function fetchAndProcessData() {
       setLoading(true);
       try {
+        console.log("Retrieving API data...");
         const apiData = await getData();
         const processedData = preprocessApiData(apiData);
         console.log(processedData);
