@@ -121,7 +121,7 @@ const SidePanel = ({ selectedData, onClose }) => {
       </button>
       {Array.isArray(selectedData) ? (
         // Cluster is selected, group by instance ID
-        <div className="accordion">
+        <div className="accordion-container">
           {Object.keys(groupedData).map((instanceId) => (
             <div key={instanceId} className="accordion-item-wrapper">
               <strong>{instanceId}</strong>
@@ -140,12 +140,17 @@ const SidePanel = ({ selectedData, onClose }) => {
         </div>
       ) : (
         // Single marker is selected
-        <AccordionItem
-          instanceScore={selectedData.instanceScore}
-          orchObj={selectedData.orchObj}
-          instanceObj={selectedData.instanceObj}
-          startExpanded={true}
-        />
+        <div className="accordion-container">
+          <strong>{selectedData.instanceObj.id}</strong>
+          <div className="accordion-item-details">
+            <AccordionItem
+              instanceScore={selectedData.instanceScore}
+              orchObj={selectedData.orchObj}
+              instanceObj={selectedData.instanceObj}
+              startExpanded={true}
+            />
+          </div>
+        </div>
       )}
     </div>
   );

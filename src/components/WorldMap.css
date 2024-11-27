@@ -39,10 +39,12 @@
   color: var(--text-color);
   box-shadow: var(--box-shadow);
   padding: 1em;
-  overflow-y: auto; /* Independent scrolling within the sidebar */
+  overflow: hidden; /* Remove scroll from the entire panel */
   transition: transform 0.3s ease-in-out;
   border-left: 1px solid var(--border-color);
-  z-index: 15; /* Ensure it stays above the map when visible */
+  z-index: 15;
+  display: flex;
+  flex-direction: column; /* Align elements vertically */
 }
 
 @media (max-width: 768px) {
@@ -51,29 +53,9 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%; /* Cover entire viewport height */
-    overflow-y: auto; /* Allow scrolling within the side panel */
-    z-index: 20; /* Ensure it overlays the map */
+    height: 100%;
+    z-index: 20;
   }
-}
-
-/* Scrollbar Styling */
-.side-panel::-webkit-scrollbar {
-  width: 12px;
-}
-
-.side-panel::-webkit-scrollbar-track {
-  background: var(--scrollbar-track-color);
-}
-
-.side-panel::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb-color);
-  border-radius: 6px;
-  filter: brightness(0.8);
-}
-
-.side-panel::-webkit-scrollbar-thumb:hover {
-  background: var(--scrollbar-thumb-hover-color);
 }
 
 /* Close button styling */
@@ -84,9 +66,11 @@
   padding: 10px;
   font-size: 16px;
   cursor: pointer;
-  margin-bottom: 20px;
   border-radius: 5px;
-  width: 100%
+  width: 100%;
+  margin-bottom: 1em; /* Add margin below the button */
+  z-index: 20; /* Ensure button stays on top */
+  flex-shrink: 0; /* Prevent close button from resizing */
 }
 
 .close-button:hover {
@@ -155,6 +139,31 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Accordion container with scrolling */
+.accordion-container {
+  overflow-y: auto;
+  flex: 1; /* Allow accordion to take the remaining height */
+}
+
+/* Scrollbar Styling */
+.accordion-container::-webkit-scrollbar {
+  width: 12px;
+}
+
+.accordion-container::-webkit-scrollbar-track {
+  background: var(--scrollbar-track-color);
+}
+
+.accordion-container::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-color);
+  border-radius: 6px;
+  filter: brightness(0.8);
+}
+
+.accordion-container::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover-color);
 }
 
 .item-key {
