@@ -30,8 +30,7 @@ const AccordionItem = ({ instanceScore, orchObj, instanceObj, startExpanded }) =
       </div>
       {isExpanded && (
         <div className="accordion-item-details">
-          <p>Address: {orchObj.id}</p>
-          {orchObj.name != orchObj.id && <p>ENS: {orchObj.name}</p>}
+          <strong>{orchObj.id}</strong>
           <div><strong>KPI score:</strong> {instanceScore.toFixed(4) * 100}%</div>
           <hr />
           <strong>Global Stats:</strong>
@@ -139,16 +138,7 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
     });
   };
 
-  // Filter orchestrators based on search term
-  const validOrchestrators = orchestrators.filter((orch) =>
-    orch.instances.every(
-      (instance) =>
-        instance.latitude !== undefined &&
-        instance.longitude !== undefined
-    )
-  );
-
-  const filteredOrchestrators = validOrchestrators.filter((orch) =>
+  const filteredOrchestrators = orchestrators.filter((orch) =>
     orch.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     orch.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -207,7 +197,7 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
             }}
           >
             {filteredOrchestrators.map((orch) =>
-              orch.instances.map((instance, index) => (
+              orch.instances.map((instance, index) => instance.latitude && instance.longitude && instance.latitude != -1 && instance.longitude != -1 && (
                 <Marker
                   key={`${orch.name}-${index}`}
                   position={[instance.latitude, instance.longitude]}
