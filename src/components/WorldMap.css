@@ -21,7 +21,7 @@
   background-color: var(--darker);
   color: var(--text-color);
   box-shadow: var(--box-shadow);
-  padding: 20px;
+  padding: 1em;
   overflow-y: auto;
   transition: transform 0.3s ease-in-out;
   border-left: 1px solid var(--border-color);
@@ -93,7 +93,11 @@
 }
 
 .accordion-item-details {
-  padding: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Adds ellipsis for truncated content */
+  white-space: nowrap; /* Prevents wrapping */
+  margin-top: 0.2em;
+  padding: 0;
   background-color: var(--darker);
   color: var(--text-color);
   border-top: 1px solid var(--border-color);
@@ -125,10 +129,15 @@
   transition: transform 0.2s ease;
   cursor: pointer;
   border-radius: 50%;
-  border: 3px solid var(--lightest);
+  border: 6px solid var(--darkest);
   text-align: center; 
-  color: white;
+  color: var(--darkest);
   font-size: 12px;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 
 .custom-pin:hover {
@@ -140,12 +149,18 @@
   transition: transform 0.2s ease;
   cursor: pointer;
   background-color: var(--blue);
-  width: 36px;
-  height: 36px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  border: 3px solid var(--grey);
+  border: 6px solid var(--darkest);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: var(--darkest);
 }
 
 .probe-pin:hover {
   transform: scale(1.1);
 }
+

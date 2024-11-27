@@ -6,6 +6,10 @@ import "react-leaflet-markercluster/dist/styles.min.css";
 import L from "leaflet";
 import "./WorldMap.css";
 import TimeAgo from 'react-timeago';
+import { FaBroadcastTower, FaServer } from 'react-icons/fa';
+import ReactDOMServer from 'react-dom/server';
+const broadcastTowerIconHTML = ReactDOMServer.renderToString(<FaBroadcastTower />);
+const serverIconHTML = ReactDOMServer.renderToString(<FaServer />);
 
 // Hardcoded probe region pins
 const probeRegions = [
@@ -31,7 +35,7 @@ const AccordionItem = ({ instanceScore, orchObj, instanceObj, startExpanded }) =
       {isExpanded && (
         <div className="accordion-item-details">
           <strong>{orchObj.id}</strong>
-          <div><strong>KPI score:</strong> {instanceScore.toFixed(4) * 100}%</div>
+          <div><strong>KPI score:</strong> {(instanceScore * 100).toFixed(1)}%</div>
           <hr />
           <strong>Global Stats:</strong>
           <p>Discovery Time: {orchObj.avgDiscoveryTime.toPrecision(3)} ms</p>
@@ -59,9 +63,26 @@ const AccordionItem = ({ instanceScore, orchObj, instanceObj, startExpanded }) =
   );
 };
 
+// Helper function to group instances by instance.id
+const groupInstancesById = (markers) => {
+  return markers.reduce((acc, marker) => {
+    const instanceId = marker.options.options.instanceObj.id;
+
+    if (!acc[instanceId]) {
+      acc[instanceId] = [];
+    }
+    acc[instanceId].push(marker);
+
+    return acc;
+  }, {});
+};
+
 // Side panel to show selected cluster or marker details
 const SidePanel = ({ selectedData, onClose }) => {
   if (!selectedData) return null;
+
+  // Group the markers by instance ID if a cluster is selected
+  const groupedData = Array.isArray(selectedData) ? groupInstancesById(selectedData) : null;
 
   return (
     <div className="side-panel">
@@ -69,15 +90,22 @@ const SidePanel = ({ selectedData, onClose }) => {
         Close
       </button>
       {Array.isArray(selectedData) ? (
-        // Cluster is selected
+        // Cluster is selected, group by instance ID
         <div className="accordion">
-          {selectedData.map((marker, index) => (
-            <AccordionItem
-              key={index}
-              instanceScore={marker.options.options.instanceScore}
-              orchObj={marker.options.options.orchObj}
-              instanceObj={marker.options.options.instanceObj}
-            />
+          {Object.keys(groupedData).map((instanceId) => (
+            <div key={instanceId} className="accordion-item-wrapper">
+              <strong>{instanceId}</strong>
+              <div className="accordion-item-details">
+                {groupedData[instanceId].map((marker, index) => (
+                  <AccordionItem
+                    key={index}
+                    instanceScore={marker.options.options.instanceScore}
+                    orchObj={marker.options.options.orchObj}
+                    instanceObj={marker.options.options.instanceObj}
+                  />
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       ) : (
@@ -129,7 +157,7 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
         .reduce((sum, score) => sum + score, 0) / childCount
     ).toFixed(2);
 
-    let size = Math.min(20 + childCount * 2, 80);
+    let size = Math.min(36 + childCount * 2, 96);
     const color = getPinColor(avgScore);
 
     return L.divIcon({
@@ -210,11 +238,9 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
                     className: "dummy",
                     html: `<div class="custom-pin" style="background-color: ${selectedData?.instanceObj?.id === instance.id ? "var(--magenta)" :
                       getPinColor(instance[selectedKPI])
-                      }; width: ${selectedData?.instanceObj?.id === instance.id ? "36px" :
-                        "24px"
-                      }; height: ${selectedData?.instanceObj?.id === instance.id ? "36px" :
-                        "24px"
-                      }; border-radius: 50%;"></div>`,
+                      }; width: ${selectedData?.instanceObj?.id === instance.id ? "48px" : "36px"
+                      }; height: ${selectedData?.instanceObj?.id === instance.id ? "48px" : "36px"
+                      }; border-radius: 50%;">${serverIconHTML}</div>`,
                   })}
                   eventHandlers={{
                     click: () => {
@@ -247,7 +273,7 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
               position={[region.latitude, region.longitude]}
               icon={L.divIcon({
                 className: 'dummy',
-                html: `<div class="probe-pin""></div>`,
+                html: `<div class="probe-pin">${broadcastTowerIconHTML}</div>`,
               })}
             >
               <Tooltip>
