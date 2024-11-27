@@ -33,7 +33,7 @@ const AccordionItem = ({ instanceScore, orchObj, instanceObj, startExpanded }) =
         <span className="accordion-icon">{isExpanded ? "-" : "+"}</span>
       </div>
       {isExpanded && (
-        <div className="accordion-item-details">
+        <div className="accordion-expanded-details" style={{marginTop: "5px"}}>
           <strong>{orchObj.id}</strong>
           <div className="accordion-item-row">
             <span className="item-key">KPI Score:</span>
@@ -244,6 +244,7 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
 
           {/* Clustered Markers */}
           <MarkerClusterGroup
+            key={"map-" + selectedKPI}
             showCoverageOnHover={false}
             spiderfyOnMaxZoom={false}
             zoomToBoundsOnClick={false}

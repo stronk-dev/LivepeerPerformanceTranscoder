@@ -144,13 +144,13 @@
   color: var(--weird);
   border-color: var(--yellow);
   z-index: 12;
-  transform: scale(1.05);
+  transform: scale(1, 1.10);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .tab:hover {
   background: var(--darker);
-  transform: scale(1.10);
+  transform: scale(1, 1.10);
 }
 
 @media (max-width: 768px) {
@@ -167,67 +167,6 @@
 
 .tab-icon {
   margin-right: 8px;
-}
-
-/* Accordion Styles */
-.accordion-item-wrapper {
-  margin-bottom: 15px;
-  border: 1px solid var(--border-color);
-  border-radius: 5px;
-  background-color: var(--section-background);
-}
-
-.accordion-item-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px;
-  cursor: pointer;
-  background-color: var(--button-background);
-  color: var(--heading-color);
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
-}
-
-.accordion-item-header:hover {
-  background-color: var(--button-hover-background);
-}
-
-.accordion-item-details {
-  padding: 15px;
-  background-color: var(--darker);
-  color: var(--text-color);
-  border-top: 1px solid var(--border-color);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.accordion-item-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 5px 0;
-}
-
-.item-key {
-  font-weight: bold;
-  flex: 1;
-  text-align: left;
-}
-
-.item-value {
-  flex: 2;
-  text-align: right;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.accordion-section-title {
-  font-weight: bold;
-  margin-top: 15px;
-  margin-bottom: 5px;
-  color: var(--heading-color);
 }
 
 /* Ranking Section Styles */

@@ -33,7 +33,7 @@
 /* Side panel styling */
 .side-panel {
   position: relative;
-  width: 400px;
+  width: 300px;
   height: 100%;
   background-color: var(--darker);
   color: var(--text-color);
@@ -60,9 +60,9 @@
 
 /* Close button styling */
 .close-button {
-  background-color: var(--button-background);
+  background-color: var(--dark);
   border: none;
-  color: var(--button-text-color);
+  color: var(--lightest);
   padding: 10px;
   font-size: 16px;
   cursor: pointer;
@@ -74,15 +74,13 @@
 }
 
 .close-button:hover {
-  background-color: var(--button-hover-background);
+  background-color: var(--dark);
 }
 
 /* Accordion item styling */
 .accordion-item-wrapper {
   margin-bottom: 15px;
-  border: 1px solid var(--border-color);
   border-radius: 5px;
-  background-color: var(--section-background);
 }
 
 .accordion-item-header {
@@ -110,17 +108,16 @@
 }
 
 .accordion-item-header:hover {
-  background-color: var(--button-hover-background);
+  background-color: var(--dark);
 }
 
 .accordion-item-details {
-  padding: 15px;
-  background-color: var(--darker);
+  padding: 0.5em;
   color: var(--text-color);
   border-top: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 2px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -132,10 +129,29 @@
   white-space: nowrap;
 }
 
+.accordion-expanded-details {
+  padding: 0.5em;
+  color: var(--text-color);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--grey);
+  background-color: var(--dark);
+  gap: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+
+.accordion-expanded-details strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .accordion-item-row {
   display: flex;
   justify-content: space-between;
-  padding: 5px 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -167,7 +183,7 @@
 }
 
 .item-key {
-  font-weight: bold;
+  font-weight: normal;
   flex: 1;
   text-align: left;
 }
@@ -178,6 +194,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-weight: normal;
 }
 
 .accordion-section-title {
