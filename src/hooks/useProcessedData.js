@@ -14,8 +14,10 @@ const useProcessedData = () => {
     const perRegionStats = {};
     const orchestrators = Object.entries(apiData).map(([orchestratorId, orchestratorData]) => {
       const leaderboardResults = orchestratorData.leaderboardResults || {};
-      const instances = Object.entries(orchestratorData.instances || {}).map(
-        ([instanceId, instanceData]) => {
+
+      // Filter instances by valid latitude, longitude, and price
+      const instances = Object.entries(orchestratorData.instances || {})
+        .map(([instanceId, instanceData]) => {
           const probedFrom = Object.keys(instanceData.probedFrom || {});
           const regions = Object.keys(instanceData.regions || {});
           const livepeerRegions = Object.keys(instanceData.livepeer_regions || {});
@@ -25,15 +27,20 @@ const useProcessedData = () => {
             0
           );
 
-          const avgRTR = livepeerRegions.reduce((sum, region) => {
-            const leaderboard = leaderboardResults[region];
-            return leaderboard ? sum + (leaderboard.latestRTR || 0) : sum;
-          }, 0) / (livepeerRegions.length || 1);
+          const validLivepeerRegionsForRTR = livepeerRegions.filter((region) =>
+            leaderboardResults[region]?.latestRTR !== undefined &&
+            leaderboardResults[region]?.latestRTR !== Infinity &&
+            leaderboardResults[region].latestRTR > 0
+          );
 
-          const avgSR = livepeerRegions.reduce((sum, region) => {
-            const leaderboard = leaderboardResults[region];
-            return leaderboard ? sum + (leaderboard.latestSR || 0) : sum;
-          }, 0) / (livepeerRegions.length || 1);
+          const avgRTR =
+            validLivepeerRegionsForRTR.reduce((sum, region) => {
+              return sum + leaderboardResults[region].latestRTR;
+            }, 0) / (validLivepeerRegionsForRTR.length || 1);
+
+          const avgSR = validLivepeerRegionsForRTR.reduce((sum, region) => {
+            return sum + (leaderboardResults[region]?.latestSR || 0);
+          }, 0) / (validLivepeerRegionsForRTR.length || 1);
 
           const bestDiscoveryTime = Object.values(orchestratorData.regionalStats || {})
             .map((stats) => stats.avgDiscoveryTime || Infinity)
@@ -41,34 +48,50 @@ const useProcessedData = () => {
 
           return {
             id: instanceId,
-            price: instanceData.price || 0,
-            latitude: instanceData.latitude || null,
-            longitude: instanceData.longitude || null,
+            price: instanceData.price >= 0 ? instanceData.price : Infinity,
+            latitude: instanceData.latitude,
+            longitude: instanceData.longitude,
             probedFrom,
             regions,
             livepeer_regions: livepeerRegions,
             lastPing: lastPing || null,
-            bestDiscoveryTime: bestDiscoveryTime === Infinity ? null : bestDiscoveryTime,
-            avgRTR: avgRTR || 0,
-            avgSR: avgSR || 0,
+            bestDiscoveryTime,
+            avgRTR: avgRTR ? avgRTR : Infinity,
+            avgSR: avgSR,
           };
-        }
-      );
+        })
+        .filter(
+          (instance) =>
+            instance.latitude !== null &&
+            instance.latitude !== -1 &&
+            instance.longitude !== null &&
+            instance.longitude !== -1
+        );
 
+      // Calculate orchestrator-level statistics
+      const validInstancesForPrice = instances.filter((inst) => inst.price !== null && inst.price !== Infinity && inst.price >= 0);
       const avgPrice =
-        instances.reduce((sum, inst) => sum + inst.price, 0) / (instances.length || 1);
+        validInstancesForPrice.length > 0
+          ? validInstancesForPrice.reduce((sum, inst) => sum + inst.price, 0) / validInstancesForPrice.length
+          : -1;
 
-      const avgDiscoveryTime = Object.values(orchestratorData.regionalStats || {})
-        .map((stats) => stats.avgDiscoveryTime || Infinity)
-        .reduce((best, current) => Math.min(best, current), Infinity);
+      const validInstancesForDiscovery = instances.filter((inst) => inst.bestDiscoveryTime !== null && inst.bestDiscoveryTime !== Infinity && inst.bestDiscoveryTime >= 0);
+      const avgDiscoveryTime =
+        validInstancesForDiscovery.length > 0
+          ? validInstancesForDiscovery.reduce((sum, inst) => sum + inst.bestDiscoveryTime, 0) / validInstancesForDiscovery.length
+          : Infinity;
 
+      const validRTRValues = Object.values(leaderboardResults)
+        .map((metrics) => metrics.latestRTR)
+        .filter((rtr) => rtr !== undefined && rtr !== Infinity && rtr > 0);
       const avgRTR =
-        Object.values(leaderboardResults).reduce((sum, metrics) => sum + (metrics.latestRTR || 0), 0) /
-        (Object.keys(leaderboardResults).length || 1);
+        validRTRValues.length > 0 ? validRTRValues.reduce((sum, rtr) => sum + rtr, 0) / validRTRValues.length : Infinity;
 
+      const validSRValues = Object.values(leaderboardResults)
+        .map((metrics) => metrics.latestSR)
+        .filter((sr) => sr !== undefined);
       const avgSR =
-        Object.values(leaderboardResults).reduce((sum, metrics) => sum + (metrics.latestSR || 0), 0) /
-        (Object.keys(leaderboardResults).length || 1);
+        validSRValues.length > 0 ? validSRValues.reduce((sum, sr) => sum + sr, 0) / validSRValues.length : 0.0;
 
       // Store regional stats for avgPrice and avgDiscoveryTime
       const bestPriceByRegion = {};
@@ -81,9 +104,9 @@ const useProcessedData = () => {
             bestPriceByRegion[region] = instance.price;
           }
           if (!bestDiscoveryTimeByRegion[region]) {
-            bestDiscoveryTimeByRegion[region] = orchestratorData.regionalStats[region].avgDiscoveryTime || Infinity;
+            bestDiscoveryTimeByRegion[region] = orchestratorData.regionalStats[region]?.avgDiscoveryTime || Infinity;
           } else if (
-            orchestratorData.regionalStats[region].avgDiscoveryTime &&
+            orchestratorData.regionalStats[region]?.avgDiscoveryTime &&
             orchestratorData.regionalStats[region].avgDiscoveryTime > 0.0 &&
             bestDiscoveryTimeByRegion[region] > orchestratorData.regionalStats[region].avgDiscoveryTime
           ) {
@@ -91,9 +114,10 @@ const useProcessedData = () => {
           }
         });
       });
+
       // Store avgRTR per livepeer region
       const bestRTRByRegion = {};
-      Object.entries(leaderboardResults).map(([region, leaderboard]) => {
+      Object.entries(leaderboardResults).forEach(([region, leaderboard]) => {
         if (!bestRTRByRegion[region]) {
           bestRTRByRegion[region] = leaderboard.latestRTR || Infinity;
         } else if (leaderboard.latestRTR && leaderboard.latestRTR > 0.0 && bestRTRByRegion[region] > leaderboard.latestRTR) {
@@ -104,10 +128,10 @@ const useProcessedData = () => {
       return {
         id: orchestratorId,
         name: orchestratorData.name,
-        avgPrice: avgPrice || 0,
-        avgDiscoveryTime: avgDiscoveryTime === Infinity ? null : avgDiscoveryTime,
-        avgRTR: avgRTR || 0,
-        avgSR: avgSR || 0,
+        avgPrice,
+        avgDiscoveryTime,
+        avgRTR,
+        avgSR,
         instances,
         bestPriceByRegion,
         bestDiscoveryTimeByRegion,
@@ -116,9 +140,9 @@ const useProcessedData = () => {
     });
 
     // Calculate average values for normalization across orchestrators
-    const allDiscoveryTimes = orchestrators.map((orchestrator) => orchestrator.avgDiscoveryTime).filter((time) => time !== null);
-    const allPrices = orchestrators.map((orchestrator) => orchestrator.avgPrice).filter((price) => price !== null);
-    const allRTR = orchestrators.map((orchestrator) => orchestrator.avgRTR).filter((rtr) => rtr !== null);
+    const allDiscoveryTimes = orchestrators.map((orchestrator) => orchestrator.avgDiscoveryTime).filter((time) => time !== null && time !== Infinity && time > 0.0);
+    const allPrices = orchestrators.map((orchestrator) => orchestrator.avgPrice).filter((price) => price !== null && price !== Infinity && price >= 0.0);
+    const allRTR = orchestrators.map((orchestrator) => orchestrator.avgRTR).filter((rtr) => rtr !== null && rtr !== Infinity && rtr > 0.0);
 
     const minDiscoveryTime = Math.min(...allDiscoveryTimes);
     const maxDiscoveryTime = Math.max(...allDiscoveryTimes);
@@ -146,9 +170,9 @@ const useProcessedData = () => {
 
     // Calculate average values for normalization across instances
     const allInstances = orchestrators.flatMap((orchestrator) => orchestrator.instances);
-    const allInstanceDiscoveryTimes = allInstances.map((inst) => inst.bestDiscoveryTime).filter((time) => time !== null && time >= 0.0);
-    const allInstancePrices = allInstances.map((inst) => inst.price).filter((price) => price !== null && price >= 0.0);
-    const allInstanceRTR = allInstances.map((inst) => inst.avgRTR).filter((rtr) => rtr !== null && rtr >= 0.0);
+    const allInstanceDiscoveryTimes = allInstances.map((inst) => inst.bestDiscoveryTime).filter((time) => time !== null && time !== Infinity && time > 0.0);
+    const allInstancePrices = allInstances.map((inst) => inst.price).filter((price) => price !== null && price !== Infinity && price >= 0.0);
+    const allInstanceRTR = allInstances.map((inst) => inst.avgRTR).filter((rtr) => rtr !== null && rtr !== Infinity && rtr > 0.0);
 
     const minInstanceDiscoveryTime = Math.min(...allInstanceDiscoveryTimes);
     const maxInstanceDiscoveryTime = Math.max(...allInstanceDiscoveryTimes);
@@ -196,49 +220,58 @@ const useProcessedData = () => {
     const priceBuckets = createBuckets(allInstancePrices, 10);
     const discoveryTimeBuckets = createBuckets(allInstanceDiscoveryTimes, 10);
     const performanceBucketsRTR = createBuckets(allInstanceRTR, 10);
-    const performanceBucketsSR = createBuckets(orchestrators.map((orchestrator) => orchestrator.avgSR).filter((sr) => sr !== null), 10);
 
     const aggregates = {
       pricing: calculateAggregateStats(allInstancePrices),
       discoveryTime: calculateAggregateStats(allInstanceDiscoveryTimes),
       performanceRTR: calculateAggregateStats(allInstanceRTR),
-      performanceSR: calculateAggregateStats(orchestrators.map((orchestrator) => orchestrator.avgSR).filter((sr) => sr !== null)),
       buckets: {
         pricing: priceBuckets,
         discoveryTime: discoveryTimeBuckets,
         performanceRTR: performanceBucketsRTR,
-        performanceSR: performanceBucketsSR,
       },
     };
 
     return { orchestrators, perRegionStats, aggregates };
   }
 
-  // Utility to create histogram buckets
-  function createBuckets(values, bucketCount) {
-    if (!Array.isArray(values) || values.length === 0) {
-      return Array.from({ length: bucketCount }, (_, i) => ({
-        range: [0, 0],
+  function createBuckets(data, bucketSize) {
+    if (!Array.isArray(data) || data.length === 0) {
+      // No valid data, return empty buckets with appropriate metadata
+      return Array.from({ length: bucketSize }, (_, i) => ({
+        range: [i * bucketSize, (i + 1) * bucketSize],
         count: 0,
       }));
     }
 
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-    const range = max - min;
-    const bucketSize = range > 0 ? range / bucketCount : 1;
+    // Proceed with the bucket creation logic if there is valid data
+    const minValue = Math.min(...data);
+    const maxValue = Math.max(...data);
 
-    const buckets = Array.from({ length: bucketCount }, (_, i) => ({
-      range: [min + i * bucketSize, min + (i + 1) * bucketSize],
+    if (minValue === maxValue) {
+      // If all values are the same, create a single bucket for the entire range
+      return [
+        {
+          range: [minValue, maxValue],
+          count: data.length,
+        },
+      ];
+    }
+
+    const bucketRange = (maxValue - minValue) / bucketSize;
+    const buckets = Array.from({ length: bucketSize }, (_, i) => ({
+      range: [minValue + i * bucketRange, minValue + (i + 1) * bucketRange],
       count: 0,
     }));
 
-    values.forEach((value) => {
-      const index = Math.min(
-        bucketCount - 1,
-        Math.floor((value - min) / bucketSize)
-      );
-      buckets[index].count++;
+    data.forEach((value) => {
+      if (value !== null && value !== undefined) {
+        const bucketIndex = Math.min(
+          Math.floor((value - minValue) / bucketRange),
+          bucketSize - 1
+        );
+        buckets[bucketIndex].count += 1;
+      }
     });
 
     return buckets;
@@ -269,21 +302,20 @@ const useProcessedData = () => {
   }
 
   useEffect(() => {
-    const loadData = async () => {
+    async function fetchAndProcessData() {
+      setLoading(true);
       try {
-        const data = await getData();
-        const preprocessed = preprocessApiData(data);
-        console.log(preprocessed);
-        setProcessedData(preprocessed);
+        const apiData = await getData();
+        const processedData = preprocessApiData(apiData);
+        console.log(processedData);
+        setProcessedData(processedData);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Data processing failed", error);
         setError(true);
-      } finally {
-        setLoading(false);
       }
-    };
-
-    loadData();
+      setLoading(false);
+    }
+    fetchAndProcessData();
   }, []);
 
   return { isLoading, isError, processedData };

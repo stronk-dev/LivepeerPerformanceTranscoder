@@ -86,7 +86,7 @@ const AccordionItem = ({ instanceScore, orchObj, instanceObj, startExpanded }) =
             <span className="item-value">{(instanceObj.avgSR * 100).toFixed(1)}%</span>
           </div>
           <hr />
-          <div><strong>Probed From:</strong> {instanceObj.probedFrom.map((location) => <p>{location}</p>)}</div>
+          <div><strong>Probed From:</strong> {instanceObj.probedFrom.map((location) => <p key={instanceObj.id + location}>{location}</p>)}</div>
         </div>
       )}
     </div>
