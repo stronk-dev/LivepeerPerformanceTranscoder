@@ -33,7 +33,7 @@ const AccordionItem = ({ instanceScore, orchObj, instanceObj, startExpanded }) =
         <span className="accordion-icon">{isExpanded ? "-" : "+"}</span>
       </div>
       {isExpanded && (
-        <div className="accordion-expanded-details" style={{marginTop: "5px"}}>
+        <div className="accordion-expanded-details" style={{ marginTop: "5px" }}>
           <strong>{orchObj.id}</strong>
           <div className="accordion-item-row">
             <span className="item-key">Last Ping:</span>
@@ -57,11 +57,11 @@ const AccordionItem = ({ instanceScore, orchObj, instanceObj, startExpanded }) =
           <div className="accordion-section-title">Instance Stats:</div>
           <div className="accordion-item-row">
             <span className="item-key">Discovery Time:</span>
-            <span className="item-value">{instanceObj.bestDiscoveryTime.toPrecision(3)} ms</span>
+            <span className="item-value">{instanceObj.bestDiscoveryTime < 1000 ? instanceObj.bestDiscoveryTime.toPrecision(3) : instanceObj.bestDiscoveryTime.toFixed(0)} ms</span>
           </div>
           <div className="accordion-item-row">
             <span className="item-key">Price:</span>
-            <span className="item-value">{instanceObj.price.toPrecision(3)} PPP</span>
+            <span className="item-value">{instanceObj.price < 1000 ? instanceObj.price.toPrecision(3) : instanceObj.price.toFixed(0)} PPP</span>
           </div>
           <div className="accordion-item-row">
             <span className="item-key">RTRatio:</span>
@@ -75,11 +75,11 @@ const AccordionItem = ({ instanceScore, orchObj, instanceObj, startExpanded }) =
           <div className="accordion-section-title">Orchestrator averages:</div>
           <div className="accordion-item-row">
             <span className="item-key">Discovery Time:</span>
-            <span className="item-value">{orchObj.avgDiscoveryTime.toPrecision(3)} ms</span>
+            <span className="item-value">{orchObj.avgDiscoveryTime < 1000 ? orchObj.avgDiscoveryTime.toPrecision(3) : orchObj.avgDiscoveryTime.toFixed(0)} ms</span>
           </div>
           <div className="accordion-item-row">
             <span className="item-key">Price:</span>
-            <span className="item-value">{orchObj.avgPrice.toPrecision(3)} PPP</span>
+            <span className="item-value">{orchObj.avgPrice < 1000 ? orchObj.avgPrice.toPrecision(3) : orchObj.avgPrice.toFixed(0)} PPP</span>
           </div>
           <div className="accordion-item-row">
             <span className="item-key">RTRatio:</span>
