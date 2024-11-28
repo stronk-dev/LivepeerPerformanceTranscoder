@@ -214,9 +214,12 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
   };
 
   // Custom cluster icon
-  const createClusterCustomIcon = (cluster) => {
+  const createClusterCustomIcon = (cluster, selectedData) => {
     const childCount = cluster.getChildCount();
     const childMarkers = cluster.getAllChildMarkers();
+
+    const isSelected = Array.isArray(selectedData) && selectedData.length == childMarkers.length &&
+    selectedData.every((marker, index) => marker.options.options.instanceObj.id == childMarkers[index].options.options.instanceObj.id);
 
     const avgScore = (
       childMarkers
@@ -230,7 +233,11 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
     ).toFixed(2);
 
     let size = Math.min(36 + childCount * 2, 96);
-    const color = getPinColor(avgScore);
+    let color = getPinColor(avgScore);
+    if (isSelected){
+      size += 12;
+      color = "var(--magenta)";
+    }
 
     return L.divIcon({
       className: "dummy",
@@ -280,11 +287,11 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
 
           {/* Clustered Markers */}
           <MarkerClusterGroup
-            key={"map-" + selectedKPI + searchTerm}
+            key={"map-" + selectedKPI + searchTerm + (Array.isArray(selectedData) ? (selectedData.length + selectedData[0].options.options.instanceObj.id) : (selectedData ? selectedData.id : ""))}
             showCoverageOnHover={false}
             spiderfyOnMaxZoom={false}
             zoomToBoundsOnClick={false}
-            iconCreateFunction={(cluster) => createClusterCustomIcon(cluster)}
+            iconCreateFunction={(cluster) => createClusterCustomIcon(cluster, selectedData)}
             eventHandlers={{
               clusterclick: (e) => {
                 const cluster = e.layer;
@@ -294,7 +301,7 @@ const WorldMap = ({ orchestrators, selectedKPI }) => {
                   return;
                 }
                 const notChanged = Array.isArray(selectedData) && selectedData.length == markers.length &&
-                  selectedData.every((marker, index) => marker._leaflet_id === markers[index]._leaflet_id) || false;
+                  selectedData.every((marker, index) => marker.options.options.instanceObj.id == markers[index].options.options.instanceObj.id);
                 if (!notChanged) {
                   setSelectedData(markers);
                 } else {
