@@ -42,6 +42,10 @@ const AccordionItem = ({ instanceScore, orchObj, instanceObj, startExpanded }) =
             </span>
           </div>
           <div className="accordion-item-row">
+            <span className="item-key">Version:</span>
+            <span className="item-value">{instanceObj.version}</span>
+          </div>
+          <div className="accordion-item-row">
             <span className="item-key">Pricing Score:</span>
             <span className="item-value">{(instanceObj.normalizedPrice * 100).toFixed(1)}%</span>
           </div>

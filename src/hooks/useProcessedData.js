@@ -65,6 +65,7 @@ const useProcessedData = () => {
             bestDiscoveryTime,
             avgRTR: avgRTR ? avgRTR : Infinity,
             avgSR: avgSR,
+            version: instanceData.version ? instanceData.version : "N/A",
           };
         })
         .filter(
